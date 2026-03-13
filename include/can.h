@@ -1,8 +1,5 @@
 #pragma once
 #include <driver/twai.h>
-
-#pragma once
-#include <driver/twai.h>
 #include <driver/gpio.h>
 
 class CCANBus {
