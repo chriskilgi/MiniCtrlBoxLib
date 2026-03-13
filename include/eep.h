@@ -7,8 +7,8 @@ struct TEEPROM {
   uint8_t ui8ID;
   char acProjektbezeichnung[20]; // z.B. "MiniCtrlBox"
   char acBoardbezeichnung[20]; // z.B. "Mainboard"
-  char acSWVersion[10] = MINICTRLBOX_SW_VERSION;  // z.B. "1.0.0"
-  char acHWVersion[10] = MINICTRLBOX_HW_VERSION;  // z.B. "3.0.1"
+  char acSWVersion[10];
+  char acHWVersion[10];
 };
 
 class CEEPROM {
