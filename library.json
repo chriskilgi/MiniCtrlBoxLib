@@ -1,6 +1,6 @@
 {
-  "name": "MiniCtrlBox",
-  "version": "1.0.0",
+  "name": "MiniCtrlBoxLib",
+  "version": "git",
   "description": "Hardware-Abstraktion für die MiniCtrlBox (OLED, EEPROM, CAN-Bus, Portexpander, usw.)",
   "authors": [
     {
@@ -9,6 +9,10 @@
     }
   ],
   "frameworks": "arduino",
-  "platforms": "*"
+  "platforms": "*",
+  "build": {
+    "flags": [
+      "-D MINICTRLBOX_VERSION=\"${sysenv.GIT_DESCRIBE}\""
+    ]
+  }
 }
-
