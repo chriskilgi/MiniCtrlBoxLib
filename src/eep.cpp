@@ -36,3 +36,13 @@ void CEEPROM::readDeviceInfo(TEEPROM& deviceInfo) {
     boDeviceInfoLoaded = true;
 }
 
+void CEEPROM::setVersion(const char* version) {
+    if (!boDeviceInfoLoaded) {
+        // If device info is not loaded, we should read it first
+        readDeviceInfo(tDeviceInfo);
+    }
+    strncpy(tDeviceInfo.acVersion, version, sizeof(tDeviceInfo.acVersion) - 1);
+    tDeviceInfo.acVersion[sizeof(tDeviceInfo.acVersion) - 1] = '\0'; // Ensure null-termination
+    writeDeviceInfo(tDeviceInfo); // Write the updated device info back to EEPROM
+}
+
