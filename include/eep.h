@@ -6,7 +6,8 @@ struct TEEPROM {
   uint8_t ui8ID;
   char acProjektbezeichnung[20]; // z.B. "MiniCtrlBox"
   char acBoardbezeichnung[20]; // z.B. "Mainboard"
-  char acVersion[20];  // z.B. "V3.0"
+  char acSWVersion[10];  // z.B. "1.0.0"
+  char acHWVersion[20];  // z.B. "V3.0"
 };
 
 class CEEPROM {
@@ -33,15 +34,24 @@ public:
         }
         return tDeviceInfo.acBoardbezeichnung;
     }
-    const char* getVersion() {
+    const char* getHWVersion() {
         if (!boDeviceInfoLoaded) {
             // If device info is not loaded, we should read it first
             readDeviceInfo(tDeviceInfo);
         }
-        return tDeviceInfo.acVersion;
+        return tDeviceInfo.acHWVersion;
     }
 
-    void setVersion(const char* version);
+    const char* getSWVersion() {
+        if (!boDeviceInfoLoaded) {
+            // If device info is not loaded, we should read it first
+            readDeviceInfo(tDeviceInfo);
+        }
+        return tDeviceInfo.acSWVersion;
+    }
+
+    void setHWVersion(const char* version);
+    void setSWVersion(const char* version);
 
 private:
     void writeBlock(uint16_t memoryAddress, const uint8_t * buffer, uint16_t length);
