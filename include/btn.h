@@ -7,7 +7,7 @@
 
 class CBUTTON {
 public:
-    CBUTTON(gpio_num_t pin, uint32_t debounceMs = 50);
+    CBUTTON(gpio_num_t pin, uint32_t debounceMs = 60);
 
     ~CBUTTON(); 
 
