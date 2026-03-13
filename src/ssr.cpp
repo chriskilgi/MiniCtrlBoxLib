@@ -1,4 +1,4 @@
-#include "ssr.h"
+#include <ssr.h>
 
 CSSR::CSSR(gpio_num_t pin) : pin(pin) {
     pinMode(pin, OUTPUT);

@@ -1,4 +1,4 @@
-#include "mcp.h"
+#include <mcp.h>
 
 CMCPLOCAL::CMCPLOCAL() {
     pMCP = new MCP23017(MCP_ADDRESS, 99); // I2C address 0x20, reset pin not used

@@ -1,4 +1,4 @@
-#include "btn.h"
+#include <btn.h>
 
 CBUTTON::CBUTTON(gpio_num_t pin, uint32_t debounceMs)
     : pin(pin), debounceTimeUs(debounceMs * 1000)

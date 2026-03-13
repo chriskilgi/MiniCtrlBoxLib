@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Library",
+            "includePath": [
+                "/home/kgdp/Dokumente/Development/MiniCtrlBoxLib/include",
+                "/home/kgdp/Dokumente/Development/MiniCtrlBoxLib/src"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "LibConfig",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

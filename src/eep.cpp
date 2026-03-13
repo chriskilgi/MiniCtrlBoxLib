@@ -1,4 +1,4 @@
-#include "eep.h"
+#include <eep.h>
 
 CEEPROM::CEEPROM() : eeprom(EEPROM_ADRESS, I2C_DEVICESIZE_24LC02)
 {
