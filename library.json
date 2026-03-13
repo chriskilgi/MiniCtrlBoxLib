@@ -1,0 +1,14 @@
+{
+  "name": "MiniCtrlBox",
+  "version": "1.0.0",
+  "description": "Hardware-Abstraktion für die MiniCtrlBox (OLED, EEPROM, CAN-Bus, Portexpander, usw.)",
+  "authors": [
+    {
+      "name": "Christoph Kilgenstein",
+      "date": "2026-03-13"
+    }
+  ],
+  "frameworks": "arduino",
+  "platforms": "*"
+}
+
