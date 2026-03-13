@@ -1,6 +1,7 @@
 #include <MCP23017.h>
 
 #define MCP_ADDRESS 0x20
+#define MINICTRLBOX_VERSION_GLOB MINICTRLBOX_VERSION
 
 enum LEDColor {
     ALL = 0b00111111,
