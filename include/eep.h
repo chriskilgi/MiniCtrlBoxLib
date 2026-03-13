@@ -1,4 +1,5 @@
 #include <I2C_eeprom.h>
+#include <glo.h>
 
 #define EEPROM_ADRESS 0x50
 
@@ -6,8 +7,8 @@ struct TEEPROM {
   uint8_t ui8ID;
   char acProjektbezeichnung[20]; // z.B. "MiniCtrlBox"
   char acBoardbezeichnung[20]; // z.B. "Mainboard"
-  char acSWVersion[10];  // z.B. "1.0.0"
-  char acHWVersion[20];  // z.B. "V3.0"
+  char acSWVersion[10] = MINICTRLBOX_SW_VERSION;  // z.B. "1.0.0"
+  char acHWVersion[10] = MINICTRLBOX_HW_VERSION;  // z.B. "3.0.1"
 };
 
 class CEEPROM {
