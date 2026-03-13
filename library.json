@@ -1,6 +1,6 @@
 {
   "name": "MiniCtrlBoxLib",
-  "version": "git",
+  "version": "1.0.0",
   "description": "Hardware-Abstraktion für die MiniCtrlBox (OLED, EEPROM, CAN-Bus, Portexpander, usw.)",
   "authors": [
     {
