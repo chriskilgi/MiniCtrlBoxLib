@@ -41,6 +41,8 @@ public:
         return tDeviceInfo.acVersion;
     }
 
+    void setVersion(const char* version);
+
 private:
     void writeBlock(uint16_t memoryAddress, const uint8_t * buffer, uint16_t length);
     void readBlock(uint16_t memoryAddress, uint8_t * buffer, uint16_t length);
