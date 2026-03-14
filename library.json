@@ -1,11 +1,41 @@
 {
   "name": "MiniCtrlBoxLib",
   "version": "1.0.0",
-  "description": "Library for MiniCtrlBox",
+  "description": "High-level hardware abstraction library for the MiniCtrlBox (OLED, EEPROM, MCP23017, Buttons, CAN, etc.)",
+  "keywords": [
+    "oled",
+    "ssd1306",
+    "gfx",
+    "i2c",
+    "eeprom",
+    "mcp23017",
+    "button",
+    "input",
+    "embedded",
+    "esp32",
+    "minictrlbox"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/chriskilgi/MiniCtrlBoxLib"
   },
+  "authors": [
+    {
+      "name": "Christoph Kilger",
+      "email": "",
+      "url": "",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
   "frameworks": "arduino",
-  "platforms": "espressif32"
+  "platforms": "espressif32",
+
+  "dependencies": {
+    "adafruit/Adafruit GFX Library": "^1.12.5",
+    "adafruit/Adafruit BusIO": "^1.17.4",
+    "adafruit/Adafruit SSD1306": "^2.5.16",
+    "wollewald/MCP23017_WE": "^1.6.10",
+    "robtillaart/I2C_EEPROM": "^1.9.4"
+  }
 }
