@@ -23,6 +23,7 @@ public:
     CMCPLOCAL();
     ~CMCPLOCAL();
 
+    void begin();
     void setColor(LEDColor tLEDColor, bool boState);
 
 private:
