@@ -7,7 +7,7 @@
 
 class CBUTTON {
 public:
-    CBUTTON(gpio_num_t pin, uint32_t debounceMs = 60);
+    CBUTTON(gpio_num_t pin, uint32_t debounceMs = 80);
 
     ~CBUTTON(); 
 
@@ -30,6 +30,7 @@ private:
 
     static void IRAM_ATTR isrHandler(void* arg) {
         CBUTTON* self = static_cast<CBUTTON*>(arg);
+        if (self->flag) return; // If the flag is already set, ignore further interrupts until it's reset
         self->lastChangeUs = esp_timer_get_time();
         self->isrTriggered = true;
     }
