@@ -1,3 +1,4 @@
+#pragma once
 #include <I2C_eeprom.h>
 #include <glo.h>
 

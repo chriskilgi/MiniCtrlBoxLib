@@ -1,18 +1,11 @@
 {
   "name": "MiniCtrlBoxLib",
   "version": "1.0.0",
-  "description": "Hardware-Abstraktion für die MiniCtrlBox (OLED, EEPROM, CAN-Bus, Portexpander, usw.)",
-  "authors": [
-    {
-      "name": "Christoph Kilgenstein",
-      "date": "2026-03-13"
-    }
-  ],
+  "description": "Library for MiniCtrlBox",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chriskilgi/MiniCtrlBoxLib"
+  },
   "frameworks": "arduino",
-  "platforms": "*",
-  "build": {
-    "flags": [
-      "-D MINICTRLBOX_VERSION=\"${sysenv.GIT_DESCRIBE}\""
-    ]
-  }
+  "platforms": "espressif32"
 }

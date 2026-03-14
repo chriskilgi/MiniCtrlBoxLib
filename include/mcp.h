@@ -1,3 +1,4 @@
+#pragma once
 #include <MCP23017.h>
 
 #define MCP_ADDRESS 0x20

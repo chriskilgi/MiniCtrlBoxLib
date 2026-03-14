@@ -1,2 +1,3 @@
+#pragma once
 #define MINICTRLBOX_SW_VERSION "1.0.0"
 #define MINICTRLBOX_HW_VERSION "3.0.1"

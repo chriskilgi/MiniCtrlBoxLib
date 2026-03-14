@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 
 #define PIN_SSR 2 // GPIO pin connected to the SSR (Solid State Relay)
