@@ -5,11 +5,11 @@
 #define EEPROM_ADRESS 0x50
 
 struct TEEPROM {
-  uint8_t ui8ID;
-  char acProjektbezeichnung[20]; // z.B. "MiniCtrlBox"
-  char acBoardbezeichnung[20]; // z.B. "Mainboard"
-  char acSWVersion[10];
-  char acHWVersion[10];
+  uint8_t ui8ID;                    // z.B. 1
+  char acProjektbezeichnung[20];    // z.B. "MiniCtrlBox"
+  char acBoardbezeichnung[20];      // z.B. "Mainboard"
+  char acSWVersion[10];             // z.B. "1.0.0"
+  char acHWVersion[10];             // z.B. "3.0.1"
 };
 
 class CEEPROM {
