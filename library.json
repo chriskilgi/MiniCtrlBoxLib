@@ -21,7 +21,7 @@
   },
   "authors": [
     {
-      "name": "Christoph Kilger",
+      "name": "C. Kilgenstein",
       "email": "",
       "url": "",
       "maintainer": true
@@ -31,11 +31,12 @@
   "frameworks": "arduino",
   "platforms": "espressif32",
 
-  "dependencies": {
-    "adafruit/Adafruit GFX Library": "^1.12.5",
-    "adafruit/Adafruit BusIO": "^1.17.4",
-    "adafruit/Adafruit SSD1306": "^2.5.16",
-    "wollewald/MCP23017_WE": "^1.6.10",
-    "robtillaart/I2C_EEPROM": "^1.9.4"
-  }
+  "dependencies": [
+    { "name": "adafruit/Adafruit GFX Library", "version": "^1.12.5" },
+    { "name": "adafruit/Adafruit BusIO", "version": "^1.17.4" },
+    { "name": "adafruit/Adafruit SSD1306", "version": "^2.5.16" },
+    { "name": "wollewald/MCP23017_WE", "version": "^1.6.10" },
+    { "name": "robtillaart/I2C_EEPROM", "version": "^1.9.4" },
+    { "name": "adafruit/Adafruit PWM Servo Driver Library", "version": "^3.0.3" }
+ ]
 }
