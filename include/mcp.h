@@ -49,6 +49,7 @@ class CMCP {
         virtual void begin() = 0; 
 
     protected:
+        uint8_t mcpAddress;
         MCP23017 *pMCP;
 };
 

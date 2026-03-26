@@ -1,3 +1,4 @@
+#include <glo.h>
 #include <mcp.h>
 
 // The CMCP class provides a base class for controlling MCP23017 I/O expanders,
@@ -6,7 +7,7 @@
 // classes to control specific functionalities of the MCP23017.
 CMCP::CMCP(uint8_t mcpAddress) {
     pMCP = nullptr; // Initialize the MCP pointer to nullptr
-    pMCP = new MCP23017(mcpAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
+    this->mcpAddress = mcpAddress; // Store the I2C address for later use in derived classes
 }
 
 CMCP::~CMCP() {
@@ -26,10 +27,12 @@ CMCPLOCAL::~CMCPLOCAL() {
 }
 
 void CMCPLOCAL::begin() {
-    if(pMCP == nullptr) {
-        return; // If the MCP instance is not initialized, exit the function
+    if (!gloIsI2CDevicePresent(mcpAddress)) { // Check if the MCP23017 device is present at the specified I2C address
+        return; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
+    } else {
+        pMCP = new MCP23017(mcpAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
-
+    
     pMCP->Init(); // Initialize the MCP23017
     delay(10); // Short delay to ensure the MCP23017 is ready after initialization
     pMCP->setPortMode(0xFF, B); // Set all pins of port B as outputs (for RGB LEDs)
@@ -64,8 +67,10 @@ CMCPSLB::~CMCPSLB() {
 }
 
 void CMCPSLB::begin() {
-    if(pMCP == nullptr) {
-        return; // If the MCP instance is not initialized, exit the function
+    if (!gloIsI2CDevicePresent(mcpAddress)) { // Check if the MCP23017 device is present at the specified I2C address
+        return; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
+    } else {
+        pMCP = new MCP23017(mcpAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
 
     pMCP->Init(); // Initialize the MCP23017
