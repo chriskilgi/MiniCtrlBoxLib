@@ -1,7 +1,6 @@
 #include <pca.h>
 
 CPWMDRIVER::CPWMDRIVER() {
-
     pPwmDriver = new Adafruit_PWMServoDriver(PCA_ADDRESS); // Create an instance of the Adafruit_PWMServoDriver with the base address 0x40 (the actual address will be set via the MCP23017)
 }
 

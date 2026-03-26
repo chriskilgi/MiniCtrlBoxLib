@@ -1,6 +1,6 @@
 // CanParser.h
 #pragma once
-#include "CanProtocol.h"
+#include "canprot.h"
 
 namespace canproto {
 
