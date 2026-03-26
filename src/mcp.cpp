@@ -5,6 +5,7 @@
 // It initializes the MCP23017 and provides a common interface for derived
 // classes to control specific functionalities of the MCP23017.
 CMCP::CMCP(uint8_t mcpAddress) {
+    pMCP = nullptr; // Initialize the MCP pointer to nullptr
     pMCP = new MCP23017(mcpAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
 }
 
@@ -25,6 +26,10 @@ CMCPLOCAL::~CMCPLOCAL() {
 }
 
 void CMCPLOCAL::begin() {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+
     pMCP->Init(); // Initialize the MCP23017
     delay(10); // Short delay to ensure the MCP23017 is ready after initialization
     pMCP->setPortMode(0xFF, B); // Set all pins of port B as outputs (for RGB LEDs)
@@ -33,6 +38,10 @@ void CMCPLOCAL::begin() {
 
 
 void CMCPLOCAL::setColor(RGBLEDColor tLEDColor, bool boState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+
     uint8_t currentState = pMCP->getPort(B); // Read the current state of port B
     
     if (boState) {
@@ -55,6 +64,10 @@ CMCPSLB::~CMCPSLB() {
 }
 
 void CMCPSLB::begin() {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+
     pMCP->Init(); // Initialize the MCP23017
     delay(10); // Short delay to ensure the MCP23017 is ready after initialization
     pMCP->setPortMode(0x00, B); // Set all pins of port B as inputs (for switches)
@@ -62,6 +75,10 @@ void CMCPSLB::begin() {
 }
 
 void CMCPSLB::setLED(LEDColor tLEDColor, bool boState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+
     uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
     
     if (boState) {

@@ -5,7 +5,7 @@
 
 
 
-class CPWMDRIVER {
+class CPCA9685 {
 public:
     enum PWMChannel : uint8_t {
         RED0 = 0,
@@ -17,8 +17,8 @@ public:
         SERVO1 = 6,
         SERVO2 = 7
     };
-    CPWMDRIVER();
-    ~CPWMDRIVER();
+    CPCA9685();
+    ~CPCA9685();
 
     void begin();
     void setPWM(uint8_t channel, uint16_t on, uint16_t off);
