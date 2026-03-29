@@ -46,10 +46,12 @@ class CMCP {
         ~CMCP();
 
         // Pure virtual function to be implemented by derived classes for specific initialization
-        virtual void begin() = 0; 
+        virtual bool begin() = 0; 
+
+        bool isPresent(); // Check if the MCP23017 is present on the I2C bus
 
     protected:
-        uint8_t mcpAddress;
+        uint8_t deviceAddress;
         MCP23017 *pMCP;
 };
 
@@ -61,7 +63,7 @@ class CMCPLOCAL : public CMCP {
         CMCPLOCAL(uint8_t mcpAddress);
         ~CMCPLOCAL();
 
-        void begin() override;
+        bool begin() override;
         void setColor(RGBLEDColor tLEDColor, bool boState);
 
     private:
@@ -74,9 +76,9 @@ class CMCPSLB : public CMCP {
         CMCPSLB(uint8_t mcpAddress);
         ~CMCPSLB();
 
-        void begin() override;
+        bool begin() override;
+        uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard
         void setLED(LEDColor tLEDColor, bool boState);
-
-    private:
+        void setLEDPort(uint8_t uiState);
 };
 

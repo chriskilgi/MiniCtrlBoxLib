@@ -5,7 +5,7 @@
 
 class CSSR {
 public:
-    CSSR(gpio_num_t pin);
+    CSSR(gpio_num_t pin = GPIO_NUM_2); // Constructor with default pin GPIO 2
 
     void on();
     void off();

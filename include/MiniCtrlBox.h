@@ -8,3 +8,4 @@
 #include <can.h>
 #include <dsp.h>
 #include <pca.h>
+#include <tim.h>

@@ -10,7 +10,7 @@ public:
         uint8_t  data[8];
     };
 
-    CCANBus(gpio_num_t txPin, gpio_num_t rxPin, uint32_t bitrate = 500000);
+    CCANBus(gpio_num_t txPin = GPIO_NUM_21, gpio_num_t rxPin = GPIO_NUM_20, uint32_t bitrate = 500000);
     ~CCANBus();
 
     bool start();

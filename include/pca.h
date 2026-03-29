@@ -17,13 +17,15 @@ public:
         SERVO1 = 6,
         SERVO2 = 7
     };
-    CPCA9685();
+    CPCA9685(uint8_t baseAddress = PCA_ADDRESS);
     ~CPCA9685();
 
-    void begin();
+    bool isPresent();
+    bool begin();
     void setPWM(uint8_t channel, uint16_t on, uint16_t off);
     void allChannelsOff();
 
 private:
     Adafruit_PWMServoDriver *pPwmDriver;
+    uint8_t deviceAddress;
 };

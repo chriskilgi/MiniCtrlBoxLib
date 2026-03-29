@@ -7,12 +7,16 @@
 // classes to control specific functionalities of the MCP23017.
 CMCP::CMCP(uint8_t mcpAddress) {
     pMCP = nullptr; // Initialize the MCP pointer to nullptr
-    this->mcpAddress = mcpAddress; // Store the I2C address for later use in derived classes
+    this->deviceAddress = mcpAddress; // Store the I2C address for later use in derived classes
 }
 
 CMCP::~CMCP() {
     delete pMCP;
     pMCP = nullptr;
+}
+
+bool CMCP::isPresent() {
+    return pMCP != nullptr; // The MCP is considered present if the pointer is not null
 }
 
 /*----------------------------------------------------------------------------------------------*/
@@ -26,17 +30,18 @@ CMCPLOCAL::~CMCPLOCAL() {
     // The destructor of CMCP will clean up the MCP23017 instance
 }
 
-void CMCPLOCAL::begin() {
-    if (!gloIsI2CDevicePresent(mcpAddress)) { // Check if the MCP23017 device is present at the specified I2C address
-        return; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
+bool CMCPLOCAL::begin() {
+    if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
+        return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
-        pMCP = new MCP23017(mcpAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
+        pMCP = new MCP23017(deviceAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
     
     pMCP->Init(); // Initialize the MCP23017
     delay(10); // Short delay to ensure the MCP23017 is ready after initialization
     pMCP->setPortMode(0xFF, B); // Set all pins of port B as outputs (for RGB LEDs)
     pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (as they are not used for the RGB LEDs, we can set them as outputs to avoid floating inputs)
+    return true;
 }
 
 
@@ -66,19 +71,26 @@ CMCPSLB::~CMCPSLB() {
     // The destructor of CMCP will clean up the MCP23017 instance
 }
 
-void CMCPSLB::begin() {
-    if (!gloIsI2CDevicePresent(mcpAddress)) { // Check if the MCP23017 device is present at the specified I2C address
-        return; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
+bool CMCPSLB::begin() {
+    if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
+        return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
-        pMCP = new MCP23017(mcpAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
+        pMCP = new MCP23017(deviceAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
 
     pMCP->Init(); // Initialize the MCP23017
     delay(10); // Short delay to ensure the MCP23017 is ready after initialization
     pMCP->setPortMode(0x00, B); // Set all pins of port B as inputs (for switches)
     pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (for LEDs)
+    return true;
 }
 
+uint8_t CMCPSLB::getSwitchState() {
+    if(pMCP == nullptr) {
+        return 0; // If the MCP instance is not initialized, return 0 (no switches pressed)
+    }
+    return pMCP->getPort(B); // Read and return the state of the switches from port B
+}
 void CMCPSLB::setLED(LEDColor tLEDColor, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
@@ -92,4 +104,12 @@ void CMCPSLB::setLED(LEDColor tLEDColor, bool boState) {
         currentState &= ~tLEDColor; // Clear the specified LED color bits
     }
     pMCP->setPort(currentState, A); // Set the specified LED color on port A
+}
+
+void CMCPSLB::setLEDPort(uint8_t uiState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+
+    pMCP->setPort(uiState, A); // Set the specified LED color on port A
 }
