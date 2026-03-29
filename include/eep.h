@@ -14,32 +14,33 @@ struct TEEPROM {
 
 class CEEPROM {
 public:
-    CEEPROM();
-    bool isConnected();
+    CEEPROM(uint8_t deviceAddress = EEPROM_ADRESS);
+    bool isPresent();
     uint8_t getAddress();
 
-    void writeDeviceInfo(const TEEPROM& deviceInfo);
-    void readDeviceInfo(TEEPROM& deviceInfo);
+    void writeDeviceInfo(const TEEPROM* pDeviceInfo);
+    void readDeviceInfo(TEEPROM* pDeviceInfo);
 
     uint8_t getID() const { return tDeviceInfo.ui8ID; }
+
     const char* getProjectName()  {
         if (!boDeviceInfoLoaded) {
             // If device info is not loaded, we should read it first
-            readDeviceInfo(tDeviceInfo);
+            readDeviceInfo(&tDeviceInfo);
         }
         return tDeviceInfo.acProjektbezeichnung;
     }
     const char* getBoardName() {
         if (!boDeviceInfoLoaded) {
             // If device info is not loaded, we should read it first
-            readDeviceInfo(tDeviceInfo);
+            readDeviceInfo(&tDeviceInfo);
         }
         return tDeviceInfo.acBoardbezeichnung;
     }
     const char* getHWVersion() {
         if (!boDeviceInfoLoaded) {
             // If device info is not loaded, we should read it first
-            readDeviceInfo(tDeviceInfo);
+            readDeviceInfo(&tDeviceInfo);
         }
         return tDeviceInfo.acHWVersion;
     }
@@ -47,18 +48,21 @@ public:
     const char* getSWVersion() {
         if (!boDeviceInfoLoaded) {
             // If device info is not loaded, we should read it first
-            readDeviceInfo(tDeviceInfo);
+            readDeviceInfo(&tDeviceInfo);
         }
         return tDeviceInfo.acSWVersion;
     }
 
+    uint8_t getFreeSpace() {
+        // Calculate free space based on the size of TEEPROM and total EEPROM size
+        return I2C_DEVICESIZE_24LC02 - sizeof(TEEPROM);
+    }
     void setHWVersion(const char* version);
     void setSWVersion(const char* version);
 
+    bool writeUserData(const uint8_t * buffer, uint16_t length);
+    bool readUserData(uint8_t * buffer, uint16_t length);
 private:
-    void writeBlock(uint16_t memoryAddress, const uint8_t * buffer, uint16_t length);
-    void readBlock(uint16_t memoryAddress, uint8_t * buffer, uint16_t length);
-
     I2C_eeprom eeprom;
     TEEPROM tDeviceInfo; // Local copy of the device info for easy access
     bool boDeviceInfoLoaded = false; // Flag to indicate if device info has been loaded into tDeviceInfo

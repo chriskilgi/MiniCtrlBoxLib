@@ -5,7 +5,7 @@
 
 
 
-class CPCA9685 {
+class CSERVO {
 public:
     enum PWMChannel : uint8_t {
         RED0 = 0,
@@ -17,8 +17,8 @@ public:
         SERVO1 = 6,
         SERVO2 = 7
     };
-    CPCA9685(uint8_t baseAddress = PCA_ADDRESS);
-    ~CPCA9685();
+    CSERVO(uint8_t baseAddress = PCA_ADDRESS);
+    ~CSERVO();
 
     bool isPresent();
     bool begin();

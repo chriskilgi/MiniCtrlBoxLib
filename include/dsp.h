@@ -3,7 +3,7 @@
 
 #define DISPLAY_ADDRESS 0x3C
 
-class COLED1306 {
+class COLED {
 public:
     static constexpr uint8_t WIDTH  = 128;
     static constexpr uint8_t HEIGHT = 64;
@@ -12,7 +12,7 @@ public:
     static constexpr uint8_t COLS   = WIDTH / CHAR_W;   // 21
     static constexpr uint8_t ROWS   = HEIGHT / CHAR_H;  // 8
 
-    COLED1306(TwoWire& wire = Wire, int8_t rst = -1);
+    COLED(TwoWire& wire = Wire, int8_t rst = -1);
 
     bool begin();
 

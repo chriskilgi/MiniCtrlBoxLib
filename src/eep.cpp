@@ -1,11 +1,11 @@
 #include <eep.h>
 
-CEEPROM::CEEPROM() : eeprom(EEPROM_ADRESS, I2C_DEVICESIZE_24LC02)
+CEEPROM::CEEPROM(uint8_t deviceAddress) : eeprom(deviceAddress, I2C_DEVICESIZE_24LC02)
 {
     eeprom.begin();
 }
 
-bool CEEPROM::isConnected()
+bool CEEPROM::isPresent()
 {
     return eeprom.isConnected();
 }
@@ -15,45 +15,53 @@ uint8_t CEEPROM::getAddress()
     return eeprom.getAddress();
 }
 
-void CEEPROM::writeBlock(uint16_t memoryAddress, const uint8_t * buffer, uint16_t length)
-{
-    eeprom.writeBlock(memoryAddress, buffer, length);
+void CEEPROM::writeDeviceInfo(const TEEPROM* pDeviceInfo) {
+    tDeviceInfo = *pDeviceInfo;
+    eeprom.writeBlock(0, (const uint8_t*)pDeviceInfo, sizeof(TEEPROM));
 }
 
-void CEEPROM::readBlock(uint16_t memoryAddress, uint8_t * buffer, uint16_t length)
-{
-    eeprom.readBlock(memoryAddress, buffer, length);
-}
-
-void CEEPROM::writeDeviceInfo(const TEEPROM& deviceInfo) {
-    tDeviceInfo = deviceInfo;
-    writeBlock(0, (const uint8_t*)&deviceInfo, sizeof(TEEPROM));
-}
-
-void CEEPROM::readDeviceInfo(TEEPROM& deviceInfo) {
-    readBlock(0, (uint8_t*)&deviceInfo, sizeof(TEEPROM));
-    tDeviceInfo = deviceInfo; // Update local copy
+void CEEPROM::readDeviceInfo(TEEPROM* pDeviceInfo) {
+    eeprom.readBlock(0, (uint8_t*)pDeviceInfo, sizeof(TEEPROM));
+    tDeviceInfo = *pDeviceInfo; // Update local copy
     boDeviceInfoLoaded = true;
 }
 
 void CEEPROM::setHWVersion(const char* version) {
     if (!boDeviceInfoLoaded) {
         // If device info is not loaded, we should read it first
-        readDeviceInfo(tDeviceInfo);
+        readDeviceInfo(&tDeviceInfo);
     }
     strncpy(tDeviceInfo.acHWVersion, version, sizeof(tDeviceInfo.acHWVersion) - 1);
     tDeviceInfo.acHWVersion[sizeof(tDeviceInfo.acHWVersion) - 1] = '\0'; // Ensure null-termination
-    writeDeviceInfo(tDeviceInfo); // Write the updated device info back to EEPROM
+    writeDeviceInfo(&tDeviceInfo); // Write the updated device info back to EEPROM
 }
 
 
 void CEEPROM::setSWVersion(const char* version) {
     if (!boDeviceInfoLoaded) {
         // If device info is not loaded, we should read it first
-        readDeviceInfo(tDeviceInfo);
+        readDeviceInfo(&tDeviceInfo);
     }
     strncpy(tDeviceInfo.acSWVersion, version, sizeof(tDeviceInfo.acSWVersion) - 1);
     tDeviceInfo.acSWVersion[sizeof(tDeviceInfo.acSWVersion) - 1] = '\0'; // Ensure null-termination
-    writeDeviceInfo(tDeviceInfo); // Write the updated device info back to EEPROM
+    writeDeviceInfo(&tDeviceInfo); // Write the updated device info back to EEPROM
 }
 
+bool CEEPROM::writeUserData(const uint8_t * buffer, uint16_t length) {
+    // Write user data starting from address sizeof(TEEPROM) to avoid overwriting device info
+    if (length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
+        // Handle error: not enough space to write user data
+        return false;
+    }
+    eeprom.writeBlock(sizeof(TEEPROM), buffer, length);
+    return true;
+}
+
+bool CEEPROM::readUserData(uint8_t * buffer, uint16_t length) {
+    // Read user data starting from address sizeof(TEEPROM) to avoid reading device info
+    if (length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
+        // Handle error: not enough space to read user data
+        return false;
+    }
+    eeprom.readBlock(sizeof(TEEPROM), buffer, length);
+}

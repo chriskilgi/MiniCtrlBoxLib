@@ -58,10 +58,10 @@ class CMCP {
 
 // The CMCPLOCAL class inherits from CMCP and provides specific functionality for controlling
 // the RGB LEDs connected to the MCP23017 on the Mainboard
-class CMCPLOCAL : public CMCP {
+class CPEXPANDERLOCAL : public CMCP {
     public:
-        CMCPLOCAL(uint8_t mcpAddress);
-        ~CMCPLOCAL();
+        CPEXPANDERLOCAL(uint8_t mcpAddress);
+        ~CPEXPANDERLOCAL();
 
         bool begin() override;
         void setColor(RGBLEDColor tLEDColor, bool boState);
@@ -71,10 +71,10 @@ class CMCPLOCAL : public CMCP {
 
 // The CMCPSLB class inherits from CMCP and provides specific functionality for controlling
 // the LEDs and the switches connected to the MCP23017 on the SwitchLEDBoard
-class CMCPSLB : public CMCP {
+class CPEXPANDERREMOTE : public CMCP {
     public:
-        CMCPSLB(uint8_t mcpAddress);
-        ~CMCPSLB();
+        CPEXPANDERREMOTE(uint8_t mcpAddress);
+        ~CPEXPANDERREMOTE();
 
         bool begin() override;
         uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard

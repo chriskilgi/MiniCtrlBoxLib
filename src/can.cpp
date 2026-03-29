@@ -1,16 +1,16 @@
 #include <can.h>
 
-CCANBus::CCANBus(gpio_num_t txPin, gpio_num_t rxPin, uint32_t bitrate)
+CCANBUS::CCANBUS(gpio_num_t txPin, gpio_num_t rxPin, uint32_t bitrate)
     : txPin(txPin), rxPin(rxPin), bitrate(bitrate), running(false)
 {
 }
 
-CCANBus::~CCANBus() {
+CCANBUS::~CCANBUS() {
     stop();
     twai_driver_uninstall();
 }
 
-bool CCANBus::start() {
+bool CCANBUS::start() {
     if (running)
         return true;
 
@@ -30,7 +30,7 @@ bool CCANBus::start() {
     return true;
 }
 
-void CCANBus::stop() {
+void CCANBUS::stop() {
     if (!running)
         return;
 
@@ -38,7 +38,7 @@ void CCANBus::stop() {
     running = false;
 }
 
-bool CCANBus::transmit(const Frame& frame, uint32_t timeoutMs) {
+bool CCANBUS::transmit(const Frame& frame, uint32_t timeoutMs) {
     twai_message_t msg = {};
     msg.identifier        = frame.canIdentifier;
     msg.data_length_code  = frame.dlc;
@@ -50,7 +50,7 @@ bool CCANBus::transmit(const Frame& frame, uint32_t timeoutMs) {
     return twai_transmit(&msg, pdMS_TO_TICKS(timeoutMs)) == ESP_OK;
 }
 
-bool CCANBus::receive(Frame& outFrame, uint32_t timeoutMs) {
+bool CCANBUS::receive(Frame& outFrame, uint32_t timeoutMs) {
     twai_message_t msg;
 
     if (twai_receive(&msg, pdMS_TO_TICKS(timeoutMs)) != ESP_OK)
@@ -65,7 +65,7 @@ bool CCANBus::receive(Frame& outFrame, uint32_t timeoutMs) {
     return true;
 }
 
-twai_timing_config_t CCANBus::timingFromBitrate(uint32_t bitrate) {
+twai_timing_config_t CCANBUS::timingFromBitrate(uint32_t bitrate) {
     switch (bitrate) {
         case 250000:  return TWAI_TIMING_CONFIG_250KBITS();
         case 500000:  return TWAI_TIMING_CONFIG_500KBITS();
