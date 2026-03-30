@@ -3,8 +3,8 @@
 // Instanz-Tabelle definieren
 CTIMER* CTIMER::instances[4] = { nullptr, nullptr, nullptr, nullptr };
 
-CTIMER::CTIMER(int id, uint64_t interval_us, bool& boGlobVar, bool autoReload)
-    : id(id), boGlobVar(boGlobVar)
+CTIMER::CTIMER(int id, uint64_t interval_us, bool autoReload)
+    : id(id)
 {
     // ID → group + timer umrechnen
     groupId = id / 2;     // 0 oder 1

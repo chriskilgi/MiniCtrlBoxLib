@@ -3,14 +3,18 @@
 
 class CTIMER {
 public:
-    CTIMER(int id, uint64_t interval_us, bool& boGlobVar,bool autoReload = true);
+    CTIMER(int id, uint64_t interval_us, bool autoReload = true);
     void start();
     void stop();
 
     virtual void onTimer();   // wird bei jedem Interrupt aufgerufen
 
+    void setTimerCallbackFunction(void (*pTimerCallbackFunction)()) {
+        this->TimerCallback = pTimerCallbackFunction;
+    }
+
 protected:
-    bool &boGlobVar; // Referenz auf die globale Variable, die im Timer-Interrupt gesetzt wird
+    void (*TimerCallback)() = nullptr; // Zeiger auf die Timer-Callback-Funktion, die im Interrupt aufgerufen wird
 
 private:
     hw_timer_t* hwTimer;
@@ -30,10 +34,12 @@ private:
 
 class CMCBTIMER : public CTIMER {
 public:
-    CMCBTIMER(int id, uint64_t interval_us, bool& boGlobVar)
-        : CTIMER(id, interval_us, boGlobVar, true) {}
+    CMCBTIMER(int id, uint64_t interval_us)
+        : CTIMER(id, interval_us, true) {}
 
     void onTimer() override {
-        this->boGlobVar = true; // Setze die globale Variable, um das Ereignis anzuzeigen
+        if (this->TimerCallback != nullptr) {
+            this->TimerCallback(); // Rufe die Callback-Funktion auf, wenn sie gesetzt ist
+        }  
     }
 };
