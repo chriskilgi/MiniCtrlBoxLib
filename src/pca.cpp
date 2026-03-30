@@ -1,21 +1,21 @@
 #include <glo.h>
 #include <pca.h>
 
-CSERVO::CSERVO(uint8_t baseAddress) {
+CServo::CServo(uint8_t baseAddress) {
     pPwmDriver = nullptr; // Initialize the PWM driver pointer to nullptr
     this->deviceAddress = baseAddress; // Store the base address for later use in case we need to reinitialize the driver
 }
 
-CSERVO::~CSERVO() {
+CServo::~CServo() {
     delete pPwmDriver;
     pPwmDriver = nullptr;
 }
 
-bool CSERVO::isPresent() {
+bool CServo::isPresent() {
     return pPwmDriver != nullptr; // The MCP is considered present if the pointer is not null
 }
 
-bool CSERVO::begin() {
+bool CServo::begin() {
     if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
@@ -31,7 +31,7 @@ bool CSERVO::begin() {
     return true;
 }
 
-void CSERVO::allChannelsOff() {
+void CServo::allChannelsOff() {
     if (pPwmDriver == nullptr) {
         return;
     }
@@ -39,7 +39,7 @@ void CSERVO::allChannelsOff() {
         pPwmDriver->setPWM(i, 0, 0);
     }
 }
-void CSERVO::setPWM(uint8_t channel, uint16_t on, uint16_t off) {
+void CServo::setPWM(PWMChannel channel, uint16_t on, uint16_t off) {
     if (pPwmDriver == nullptr) {
         return;
     }

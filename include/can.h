@@ -2,7 +2,7 @@
 #include <driver/twai.h>
 #include <driver/gpio.h>
 
-class CCANBUS {
+class CCanBus {
 public:
     struct Frame {
         uint32_t canIdentifier;
@@ -10,8 +10,8 @@ public:
         uint8_t  data[8];
     };
 
-    CCANBUS(gpio_num_t txPin = GPIO_NUM_21, gpio_num_t rxPin = GPIO_NUM_20, uint32_t bitrate = 500000);
-    ~CCANBUS();
+    CCanBus(gpio_num_t txPin = GPIO_NUM_21, gpio_num_t rxPin = GPIO_NUM_20, uint32_t bitrate = 500000);
+    ~CCanBus();
 
     bool start();
     void stop();

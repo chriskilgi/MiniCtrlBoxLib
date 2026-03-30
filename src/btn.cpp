@@ -1,6 +1,6 @@
 #include <btn.h>
 
-CBUTTON::CBUTTON(gpio_num_t pin, uint32_t debounceMs)
+CButton::CButton(gpio_num_t pin, uint32_t debounceMs)
     : pin(pin), debounceTimeUs(debounceMs * 1000)
 {
     flag = false;
@@ -18,17 +18,17 @@ CBUTTON::CBUTTON(gpio_num_t pin, uint32_t debounceMs)
     gpio_config(&cfg);
 
     gpio_install_isr_service(0);
-    gpio_isr_handler_add(pin, &CBUTTON::isrHandler, this);
+    gpio_isr_handler_add(pin, &CButton::isrHandler, this);
 }
 
-CBUTTON::~CBUTTON() {
+CButton::~CButton() {
     gpio_isr_handler_remove(pin);
 }
 
-bool CBUTTON::getFlag()  const { return flag; }
-void CBUTTON::resetFlag() { flag = false; }
+bool CButton::getFlag()  const { return flag; }
+void CButton::resetFlag() { flag = false; }
 
-void CBUTTON::update() {
+void CButton::update() {
         if (!isrTriggered) return;
 
         uint64_t now = esp_timer_get_time();

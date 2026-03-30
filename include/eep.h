@@ -12,9 +12,9 @@ struct TEEPROM {
   char acHWVersion[10];             // z.B. "3.0.1"
 };
 
-class CEEPROM {
+class CEeprom {
 public:
-    CEEPROM(uint8_t deviceAddress = EEPROM_ADRESS);
+    CEeprom(uint8_t deviceAddress = EEPROM_ADRESS);
     bool isPresent();
     uint8_t getAddress();
 

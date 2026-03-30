@@ -5,7 +5,7 @@
 
 
 
-class CSERVO {
+class CServo {
 public:
     enum PWMChannel : uint8_t {
         RED0 = 0,
@@ -17,12 +17,12 @@ public:
         SERVO1 = 6,
         SERVO2 = 7
     };
-    CSERVO(uint8_t baseAddress = PCA_ADDRESS);
-    ~CSERVO();
+    CServo(uint8_t baseAddress = PCA_ADDRESS);
+    ~CServo();
 
     bool isPresent();
     bool begin();
-    void setPWM(uint8_t channel, uint16_t on, uint16_t off);
+    void setPWM(PWMChannel channel, uint16_t on, uint16_t off);
     void allChannelsOff();
 
 private:

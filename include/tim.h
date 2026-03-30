@@ -2,9 +2,9 @@
 #include <Arduino.h>
 
 // Abstraction for ESP32 hardware timers with callback functions and auto-reload functionality.
-class CTIMER {
+class CTimer {
 public:
-    CTIMER(int id, uint64_t interval_us, void (*pTimerCallbackFunction)() = nullptr, bool autoReload = true);
+    CTimer(int id, uint64_t interval_us, void (*pTimerCallbackFunction)() = nullptr, bool autoReload = true);
     void start();
     void stop();
 
@@ -28,7 +28,7 @@ private:
     int timerId; // Timer ID within the group (0 or 1)
 
     // Table of instances to allow static ISR wrappers to call the correct instance's onTimer() method
-    static CTIMER* instances[4];
+    static CTimer* instances[4];
 
     // Static ISR wrappers that call the onTimer() method of the correct instance based on the timer ID
     static void IRAM_ATTR isr0();
@@ -38,10 +38,10 @@ private:
 };
 
 // Specialized timer class that calls a user-defined callback function on each timer interrupt
-class CMCBTIMER : public CTIMER {
+class CMCBTIMER : public CTimer {
 public:
     CMCBTIMER(int id, uint64_t interval_us, void (*pTimerCallbackFunction)() = nullptr)
-        : CTIMER(id, interval_us, pTimerCallbackFunction, true) {}
+        : CTimer(id, interval_us, pTimerCallbackFunction, true) {}
 
     // Override the onTimer method to call the user-defined callback function
     void onTimer() override {

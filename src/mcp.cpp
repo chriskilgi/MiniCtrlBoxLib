@@ -20,17 +20,17 @@ bool CMCP::isPresent() {
 }
 
 /*----------------------------------------------------------------------------------------------*/
-// The CMCPLOCAL class inherits from CMCP and provides specific functionality for controlling
+// The CPortExpLoc class inherits from CMCP and provides specific functionality for controlling
 // the RGB LEDs connected to the MCP23017 on the Mainboard
-CPEXPANDERLOCAL::CPEXPANDERLOCAL(uint8_t mcpAddress) : CMCP(mcpAddress) {
+CPortExpLoc::CPortExpLoc(uint8_t mcpAddress) : CMCP(mcpAddress) {
     // The constructor of CMCP will initialize the MCP23017 instance with the specified address
 }
 
-CPEXPANDERLOCAL::~CPEXPANDERLOCAL() {
+CPortExpLoc::~CPortExpLoc() {
     // The destructor of CMCP will clean up the MCP23017 instance
 }
 
-bool CPEXPANDERLOCAL::begin() {
+bool CPortExpLoc::begin() {
     if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
@@ -45,7 +45,7 @@ bool CPEXPANDERLOCAL::begin() {
 }
 
 
-void CPEXPANDERLOCAL::setColor(RGBLEDColor tLEDColor, bool boState) {
+void CPortExpLoc::setColor(RGBLEDColor tLEDColor, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
@@ -61,17 +61,17 @@ void CPEXPANDERLOCAL::setColor(RGBLEDColor tLEDColor, bool boState) {
 }
 
 /*----------------------------------------------------------------------------------------------*/
-// The CMCPSLB class inherits from CMCP and provides specific functionality for controlling
+// The CPortExpRem class inherits from CMCP and provides specific functionality for controlling
 // the LEDs and the switches connected to the MCP23017 on the SwitchLEDBoard
-CPEXPANDERREMOTE::CPEXPANDERREMOTE(uint8_t mcpAddress) : CMCP(mcpAddress) {
+CPortExpRem::CPortExpRem(uint8_t mcpAddress) : CMCP(mcpAddress) {
     // The constructor of CMCP will initialize the MCP23017 instance with the specified address
 }
 
-CPEXPANDERREMOTE::~CPEXPANDERREMOTE() {
+CPortExpRem::~CPortExpRem() {
     // The destructor of CMCP will clean up the MCP23017 instance
 }
 
-bool CPEXPANDERREMOTE::begin() {
+bool CPortExpRem::begin() {
     if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
@@ -85,13 +85,13 @@ bool CPEXPANDERREMOTE::begin() {
     return true;
 }
 
-uint8_t CPEXPANDERREMOTE::getSwitchState() {
+uint8_t CPortExpRem::getSwitchState() {
     if(pMCP == nullptr) {
         return 0; // If the MCP instance is not initialized, return 0 (no switches pressed)
     }
     return pMCP->getPort(B); // Read and return the state of the switches from port B
 }
-void CPEXPANDERREMOTE::setLED(LEDColor tLEDColor, bool boState) {
+void CPortExpRem::setLED(LEDColor tLEDColor, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
@@ -106,7 +106,7 @@ void CPEXPANDERREMOTE::setLED(LEDColor tLEDColor, bool boState) {
     pMCP->setPort(currentState, A); // Set the specified LED color on port A
 }
 
-void CPEXPANDERREMOTE::setLEDPort(uint8_t uiState) {
+void CPortExpRem::setLEDPort(uint8_t uiState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }

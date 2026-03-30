@@ -5,11 +5,11 @@
 #define PIN_BUTTON_1 GPIO_NUM_10
 #define PIN_BUTTON_2 GPIO_NUM_3
 
-class CBUTTON {
+class CButton {
 public:
-    CBUTTON(gpio_num_t pin, uint32_t debounceMs = 80);
+    CButton(gpio_num_t pin, uint32_t debounceMs = 80);
 
-    ~CBUTTON(); 
+    ~CButton(); 
 
     bool getFlag() const;
     void resetFlag();
@@ -29,7 +29,7 @@ private:
     bool stableState;
 
     static void IRAM_ATTR isrHandler(void* arg) {
-        CBUTTON* self = static_cast<CBUTTON*>(arg);
+        CButton* self = static_cast<CButton*>(arg);
         if (self->flag)
             return; // If the flag is already set, ignore further interrupts until it's reset
         self->lastChangeUs = esp_timer_get_time();

@@ -1,11 +1,11 @@
 #include <dsp.h>
 
-COLED::COLED(TwoWire& wire, int8_t rst) : display(WIDTH, HEIGHT, &wire, rst) {
+COLed::COLed(TwoWire& wire, int8_t rst) : display(WIDTH, HEIGHT, &wire, rst) {
 
 }
 
 // Initialisierung des Displays
-bool COLED::begin() {
+bool COLed::begin() {
         if (!display.begin(SSD1306_SWITCHCAPVCC, DISPLAY_ADDRESS)) {
             return false;
         }
@@ -18,7 +18,7 @@ bool COLED::begin() {
 }
 
 // Zeile löschen
-void COLED::clearLine(uint8_t row) {
+void COLed::clearLine(uint8_t row) {
     if (row >= ROWS) return;
 
     display.fillRect(
@@ -31,7 +31,7 @@ void COLED::clearLine(uint8_t row) {
 }
 
 // Text an Zeile/Spalte ausgeben
-void COLED::printAt(uint8_t row, uint8_t col, const char* text) {
+void COLed::printAt(uint8_t row, uint8_t col, const char* text) {
     if (row >= ROWS || col >= COLS) return;
 
     // Zeile vorher löschen
@@ -48,12 +48,12 @@ void COLED::printAt(uint8_t row, uint8_t col, const char* text) {
 }
 
 // Ganze Zeile überschreiben (automatisch)
-void COLED::printLine(uint8_t row, const char* text) {
+void COLed::printLine(uint8_t row, const char* text) {
     printAt(row, 0, text);
 }
 
 // Komplettes Display löschen
-void COLED::clear() {
+void COLed::clear() {
     display.clearDisplay();
     display.display();
 }
