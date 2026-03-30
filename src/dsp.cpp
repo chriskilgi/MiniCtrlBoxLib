@@ -4,11 +4,13 @@ COLed::COLed(TwoWire& wire, int8_t rst) : display(WIDTH, HEIGHT, &wire, rst) {
 
 }
 
-// Initialisierung des Displays
+// Initialising the display and returning true if successful, false otherwise
 bool COLed::begin() {
         if (!display.begin(SSD1306_SWITCHCAPVCC, DISPLAY_ADDRESS)) {
+            boIsPresent = false;
             return false;
         }
+        boIsPresent = true;
         display.clearDisplay();
         display.setTextSize(1);
         display.setTextColor(SSD1306_WHITE);
@@ -17,7 +19,12 @@ bool COLed::begin() {
         return true;
 }
 
-// Zeile löschen
+// Check if the display is present and initialized successfully
+bool COLed::isPresent() {
+     return boIsPresent;
+}   
+
+// Clears the content of a specific line (starting at 0)
 void COLed::clearLine(uint8_t row) {
     if (row >= ROWS) return;
 
@@ -30,30 +37,58 @@ void COLed::clearLine(uint8_t row) {
     );
 }
 
-// Text an Zeile/Spalte ausgeben
+// Prints text at a specific row and column (starting at 0)
 void COLed::printAt(uint8_t row, uint8_t col, const char* text) {
     if (row >= ROWS || col >= COLS) return;
 
-    // Zeile vorher löschen
+    // Clear the line before printing
     clearLine(row);
 
-    // Cursor setzen
+    // Set cursor position based on row and column
     display.setCursor(col * CHAR_W, row * CHAR_H);
 
-    // Text ausgeben
+    // Print the text
     display.print(text);
 
-    // Aktualisieren
+    // Update the display to show the changes
     display.display();
 }
 
-// Ganze Zeile überschreiben (automatisch)
+// Override whole line (automatically starts at column 0)
 void COLed::printLine(uint8_t row, const char* text) {
     printAt(row, 0, text);
 }
 
-// Komplettes Display löschen
+// Deletes the entire display content
 void COLed::clear() {
     display.clearDisplay();
     display.display();
+}
+
+// Prints formatted text to a specific position on the display
+// Example usage: printfAt(2, 5, "Temp: %.1f C", temperature);
+void COLed::printfAt(uint8_t row, uint8_t col, const char* fmt, ...) {
+    if (row >= ROWS || col >= COLS) return;
+
+    char buffer[64];   // oder größer, je nach Bedarf
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+
+    printAt(row, col, buffer);
+}
+
+// Prints formatted text to a specific line, starting at column 0
+// Example usage: printfLine(2, "Temperature: %.1f C", temperature);
+void COLed::printfLine(uint8_t row, const char* fmt, ...) {
+    char buffer[64];
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+
+    printLine(row, buffer);
 }

@@ -14,20 +14,34 @@ public:
 
     COLed(TwoWire& wire = Wire, int8_t rst = -1);
 
+    // Initializes the display and returns true if successful, false otherwise
     bool begin();
 
-    // Zeile löschen
-    void clearLine(uint8_t row);
+    bool isPresent();
 
-    // Text an Zeile/Spalte ausgeben
+    // Writes text at a specific row and column (starting at 0)
     void printAt(uint8_t row, uint8_t col, const char* text);
 
-    // Ganze Zeile überschreiben (automatisch)
+    // Override whole line (automatically starts at column 0)
     void printLine(uint8_t row, const char* text);
 
-    // Komplettes Display löschen
+    // Deletes the entire display content
     void clear();
+
+    // Deletes the content of a specific line (starting at 0)
+    void clearLine(uint8_t row);
+
+    // Prints formatted text to a specific position on the display
+    // Example usage: printfAt(2, 5, "Temp: %.1f C", temperature);
+    void printfAt(uint8_t row, uint8_t col, const char* fmt, ...);
+    // Prints formatted text to a specific line on the display (starting at column 0)
+    // Example usage: printfLine(2, "Temp: %.1f C", temperature);
+    void printfLine(uint8_t row, const char* fmt, ...);
+
+    uint8_t getRows() const { return ROWS; }
+    uint8_t getCols() const { return COLS; }
 
 private:
     Adafruit_SSD1306 display;
+    bool boIsPresent;
 };

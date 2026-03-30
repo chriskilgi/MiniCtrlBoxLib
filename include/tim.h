@@ -38,9 +38,9 @@ private:
 };
 
 // Specialized timer class that calls a user-defined callback function on each timer interrupt
-class CMCBTIMER : public CTimer {
+class CMCBTimer : public CTimer {
 public:
-    CMCBTIMER(int id, uint64_t interval_us, void (*pTimerCallbackFunction)() = nullptr)
+    CMCBTimer(int id, uint64_t interval_us, void (*pTimerCallbackFunction)() = nullptr)
         : CTimer(id, interval_us, pTimerCallbackFunction, true) {}
 
     // Override the onTimer method to call the user-defined callback function
