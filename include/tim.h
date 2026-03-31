@@ -4,7 +4,7 @@
 // Abstraction for ESP32 hardware timers with callback functions and auto-reload functionality.
 class CTimer {
 public:
-    CTimer(int id, uint64_t interval_us, void (*pTimerCallbackFunction)() = nullptr, bool autoReload = true);
+    CTimer(int iHWTimer, uint64_t ui64TriggerIntervall, void (*pTimerCallbackFunction)() = nullptr, bool boAutoReload = true);
     void start();
     void stop();
 
@@ -16,8 +16,8 @@ public:
 
 private:
     void (*pTimerCallbackFunction)(); // Pointer to the timer callback function
-    hw_timer_t* hwTimer;
-    int id; // Timer ID (0-3, where 0 and 1 belong to group 0, and 2 and 3 belong to group 1)
+    hw_timer_t* pHwTimer;
+    int iHWTimer; // Timer ID (0-3, where 0 and 1 belong to group 0, and 2 and 3 belong to group 1)
     int groupId; // Timer group ID (0 or 1)
     int timerId; // Timer ID within the group (0 or 1)
 

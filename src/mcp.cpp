@@ -5,9 +5,9 @@
 // which are used to control the RGB LEDs and the switch LEDs in the MiniCtrlBox project. 
 // It initializes the MCP23017 and provides a common interface for derived
 // classes to control specific functionalities of the MCP23017.
-CMCP::CMCP(uint8_t mcpAddress) {
+CMCP::CMCP(uint8_t ui8MCPAddress) {
     pMCP = nullptr; // Initialize the MCP pointer to nullptr
-    this->deviceAddress = mcpAddress; // Store the I2C address for later use in derived classes
+    this->ui8MCPAddress = ui8MCPAddress; // Store the I2C address for later use in derived classes
 }
 
 CMCP::~CMCP() {
@@ -22,7 +22,7 @@ bool CMCP::isPresent() {
 /*----------------------------------------------------------------------------------------------*/
 // The CPortExpLoc class inherits from CMCP and provides specific functionality for controlling
 // the RGB LEDs connected to the MCP23017 on the Mainboard
-CPortExpLoc::CPortExpLoc(uint8_t mcpAddress) : CMCP(mcpAddress) {
+CPortExpLoc::CPortExpLoc(uint8_t ui8MCPAddress) : CMCP(ui8MCPAddress) {
     // The constructor of CMCP will initialize the MCP23017 instance with the specified address
 }
 
@@ -30,11 +30,12 @@ CPortExpLoc::~CPortExpLoc() {
     // The destructor of CMCP will clean up the MCP23017 instance
 }
 
+// The begin function initializes the MCP23017 and sets the pin modes for the RGB LEDs
 bool CPortExpLoc::begin() {
-    if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
+    if (!gloIsI2CDevicePresent(ui8MCPAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
-        pMCP = new MCP23017(deviceAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
+        pMCP = new MCP23017(ui8MCPAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
     
     pMCP->Init(); // Initialize the MCP23017
@@ -44,7 +45,7 @@ bool CPortExpLoc::begin() {
     return true;
 }
 
-
+// Function to set the state of the RGB LEDs on the Mainboard based on the specified color and state
 void CPortExpLoc::setColor(RGBLEDColor tLEDColor, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
@@ -60,10 +61,20 @@ void CPortExpLoc::setColor(RGBLEDColor tLEDColor, bool boState) {
     pMCP->setPort(currentState, B); // Set the specified LED color on port B
 }
 
+// Overloaded function to set the state of a specific LED color on the Mainboard based on the color index (0-5) and state
+void CPortExpLoc::setColor(uint8_t ui8Color, bool boState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+    if (ui8Color >= 0 && ui8Color <= 5) {
+        pMCP->setPin(ui8Color, B, boState); // Set the specified LED color on port B
+    }
+}   
+
 /*----------------------------------------------------------------------------------------------*/
 // The CPortExpRem class inherits from CMCP and provides specific functionality for controlling
 // the LEDs and the switches connected to the MCP23017 on the SwitchLEDBoard
-CPortExpRem::CPortExpRem(uint8_t mcpAddress) : CMCP(mcpAddress) {
+CPortExpRem::CPortExpRem(uint8_t ui8MCPAddress) : CMCP(ui8MCPAddress) {
     // The constructor of CMCP will initialize the MCP23017 instance with the specified address
 }
 
@@ -71,11 +82,12 @@ CPortExpRem::~CPortExpRem() {
     // The destructor of CMCP will clean up the MCP23017 instance
 }
 
+// The begin function initializes the MCP23017 and sets the pin modes for the LEDs and switches
 bool CPortExpRem::begin() {
-    if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
+    if (!gloIsI2CDevicePresent(ui8MCPAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
-        pMCP = new MCP23017(deviceAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
+        pMCP = new MCP23017(ui8MCPAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
 
     pMCP->Init(); // Initialize the MCP23017
@@ -85,12 +97,7 @@ bool CPortExpRem::begin() {
     return true;
 }
 
-uint8_t CPortExpRem::getSwitchState() {
-    if(pMCP == nullptr) {
-        return 0; // If the MCP instance is not initialized, return 0 (no switches pressed)
-    }
-    return pMCP->getPort(B); // Read and return the state of the switches from port B
-}
+// Function to set the state of the LEDs on the SwitchLEDBoard based on the specified LED color and state
 void CPortExpRem::setLED(LEDColor tLEDColor, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
@@ -106,10 +113,32 @@ void CPortExpRem::setLED(LEDColor tLEDColor, bool boState) {
     pMCP->setPort(currentState, A); // Set the specified LED color on port A
 }
 
-void CPortExpRem::setLEDPort(uint8_t uiState) {
+// Overloaded function to set the state of a specific LED on the SwitchLEDBoard based on the LED index (0-7) and state
+void CPortExpRem::setLED(uint8_t ui8LED, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
+    if (ui8LED >= 0 && ui8LED <= 7) {
+        pMCP->setPin(ui8LED, A, boState); // Set the specified LED on port A
+    }
+}   
 
-    pMCP->setPort(uiState, A); // Set the specified LED color on port A
+// Function to set the state of all LEDs on the SwitchLEDBoard based on a port state byte
+void CPortExpRem::setLEDPort(uint8_t ui8PortState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+    pMCP->setPort(ui8PortState, A); // Set the specified LED color on port A
+}
+
+// Function to read the state of the switches on the SwitchLEDBoard
+uint8_t CPortExpRem::getSwitchState() {
+    return pMCP->getPort(B); // Read and return the state of the switches from port B
+}
+
+bool CPortExpRem::getSwitchState(uint8_t ui8SwitchNo) {
+    if (ui8SwitchNo >= 0 && ui8SwitchNo <= 7) {
+        return pMCP->getPin(ui8SwitchNo, B); // Read and return the state of the specified switch from port B
+    }
+    return false;
 }

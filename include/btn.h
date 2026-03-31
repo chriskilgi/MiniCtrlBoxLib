@@ -7,20 +7,24 @@
 
 class CButton {
 public:
-    CButton(gpio_num_t pin, uint32_t debounceMs = 80);
+    CButton(gpio_num_t interruptPin, uint32_t ui32DebounceMs= 30);
 
     ~CButton(); 
 
-    bool getFlag() const;
-    void resetFlag();
+    bool hasButtonPressed() const;
+    bool hasButtonReleased() const;
+    void resetPressedFlag();
+    void resetReleasedFlag();
 
 
-    // Muss im loop() aufgerufen werden
-    void update();
+    // Has to be called in the main loop to update the button state and set the flag
+    // when a stable button press or releaseis detected
+    void updateFlags();
 
 private:
     gpio_num_t pin;
-    volatile bool flag;
+    volatile bool boPressedFlag;
+    volatile bool boReleasedFlag;
 
     uint64_t debounceTimeUs;
     uint64_t lastChangeUs;
@@ -30,8 +34,7 @@ private:
 
     static void IRAM_ATTR isrHandler(void* arg) {
         CButton* self = static_cast<CButton*>(arg);
-        if (self->flag)
-            return; // If the flag is already set, ignore further interrupts until it's reset
+
         self->lastChangeUs = esp_timer_get_time();
         self->isrTriggered = true;
     }

@@ -8,7 +8,7 @@
 
 class CMCP {
     public:
-        CMCP(uint8_t mcpAddress);
+        CMCP(uint8_t ui8MCPAddress);
         ~CMCP();
 
         // Pure virtual function to be implemented by derived classes for specific initialization
@@ -17,8 +17,8 @@ class CMCP {
         bool isPresent(); // Check if the MCP23017 is present on the I2C bus
 
     protected:
-        uint8_t deviceAddress;
-        MCP23017 *pMCP;
+        uint8_t ui8MCPAddress; // I2C address of the MCP23017
+        MCP23017 *pMCP; // Pointer to the MCP23017 instance, initialized in derived classes if the device is present
 };
 
 
@@ -36,13 +36,15 @@ class CPortExpLoc : public CMCP {
             GREEN1 = 0b00010000,
             BLUE1 = 0b00100000
         };
-        CPortExpLoc(uint8_t mcpAddress);
+        CPortExpLoc(uint8_t ui8MCPAddress = MCP_LOCAL_ADDRESS);
         ~CPortExpLoc();
 
         bool begin() override;
-        void setColor(RGBLEDColor tLEDColor, bool boState);
 
-    private:
+        // Function to set the state of the RGB LEDs based on the specified color and state
+        void setColor(RGBLEDColor tLEDColor, bool boState);
+        // Overloaded function to set the state of the RGB LEDs based on a color index (0-5) and state
+        void setColor(uint8_t ui8Color, bool boState);
 };
 
 // The CMCPSLB class inherits from CMCP and provides specific functionality for controlling
@@ -52,22 +54,26 @@ class CPortExpRem : public CMCP {
         // Konstanten für die LEDs auf dem SwitchLEDBoard
         enum LEDColor : uint8_t {
             ALLLEDS = 0b11111111,
-            LED0 = 0b00000001,
-            LED1 = 0b00000010,
-            LED2 = 0b00000100,
-            LED3 = 0b00001000,
-            LED4 = 0b00010000,
-            LED5 = 0b00100000,
-            LED6 = 0b01000000,
-            LED7 = 0b10000000
+            LEDRE0 = 0b00000001,
+            LEDYE0 = 0b00000010,
+            LEDGN0 = 0b00000100,
+            LEDBL0 = 0b00001000,
+            LEDRE1 = 0b00010000,
+            LEDYE1 = 0b00100000,
+            LEDGN1 = 0b01000000,
+            LEDBL1 = 0b10000000
         };
-        CPortExpRem(uint8_t mcpAddress);
+        CPortExpRem(uint8_t ui8MCPAddress = MCP_SLB_ADDRESS);
         ~CPortExpRem();
 
         bool begin() override;
-        uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard
+        
         void setLED(LEDColor tLEDColor, bool boState);
-        void setLEDPort(uint8_t uiState);
+        void setLED(uint8_t ui8LED, bool boState);
+        void setLEDPort(uint8_t ui8PortState); // Function to set the state of all LEDs on the SwitchLEDBoard based on a port state byte
+
+        uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard
+        bool getSwitchState(uint8_t ui8SwitchNo); // Overloaded function to check if specific switches are pressed based on a switch index (0-7)
 };
 
 // Bitwise OR operator overload for RGBLEDColor combining LED colors

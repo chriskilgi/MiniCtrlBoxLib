@@ -3,37 +3,37 @@
 // Table of instances to allow static ISR wrappers to call the correct instance's onTimer() method
 CTimer* CTimer::instances[4] = { nullptr, nullptr, nullptr, nullptr };
 
-CTimer::CTimer(int id, uint64_t interval_us, void (*pTimerCallbackFunc)(), bool autoReload)
-    : id(id), pTimerCallbackFunction(pTimerCallbackFunc)
+CTimer::CTimer(int iHWTimer, uint64_t ui64TriggerIntervall, void (*pTimerCallbackFunc)(), bool boAutoReload)
+    : iHWTimer(iHWTimer), pTimerCallbackFunction(pTimerCallbackFunc)
 {
     // ID → group + timer mapping
-    groupId = id / 2;     // 0 oder 1
-    timerId = id % 2;     // 0 oder 1
+    groupId = iHWTimer / 2;     // 0 oder 1
+    timerId = iHWTimer % 2;     // 0 oder 1
 
     // Storing the instance in the static table for ISR access
-    instances[id] = this;
+    instances[iHWTimer] = this;
 
     // Get the hardware timer instance
-    hwTimer = timerBegin(timerId, 80, true);  // 1 µs Ticks
+    pHwTimer = timerBegin(timerId, 80, true);  // 1 µs Ticks
 
     // Attach the appropriate ISR based on the timer ID
-    switch (id) {
-        case 0: timerAttachInterrupt(hwTimer, &CTimer::isr0, true); break;
-        case 1: timerAttachInterrupt(hwTimer, &CTimer::isr1, true); break;
-        case 2: timerAttachInterrupt(hwTimer, &CTimer::isr2, true); break;
-        case 3: timerAttachInterrupt(hwTimer, &CTimer::isr3, true); break;
+    switch (iHWTimer) {
+        case 0: timerAttachInterrupt(pHwTimer, &CTimer::isr0, true); break;
+        case 1: timerAttachInterrupt(pHwTimer, &CTimer::isr1, true); break;
+        case 2: timerAttachInterrupt(pHwTimer, &CTimer::isr2, true); break;
+        case 3: timerAttachInterrupt(pHwTimer, &CTimer::isr3, true); break;
     }
 
     // Configure the timer alarm with the specified interval and auto-reload setting
-    timerAlarmWrite(hwTimer, interval_us, autoReload);
+    timerAlarmWrite(pHwTimer, ui64TriggerIntervall, boAutoReload);
 }
 
 void CTimer::start() {
-    timerAlarmEnable(hwTimer);
+    timerAlarmEnable(pHwTimer);
 }
 
 void CTimer::stop() {
-    timerAlarmDisable(hwTimer);
+    timerAlarmDisable(pHwTimer);
 }
 
 // ---------------- ISR-WRAPPER ----------------
