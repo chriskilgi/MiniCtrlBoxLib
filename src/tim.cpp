@@ -36,16 +36,25 @@ void CTimer::stop() {
     timerAlarmDisable(hwTimer);
 }
 
-void CTimer::onTimer() {
-    // This method can be overridden by derived classes to implement specific behavior on timer interrupts
-}
-
 // ---------------- ISR-WRAPPER ----------------
-// Static ISR wrappers that call the onTimer() method of the correct instance based on the timer ID
-void IRAM_ATTR CTimer::isr0() { if (instances[0]) instances[0]->onTimer(); }
-void IRAM_ATTR CTimer::isr1() { if (instances[1]) instances[1]->onTimer(); }
-void IRAM_ATTR CTimer::isr2() { if (instances[2]) instances[2]->onTimer(); }
-void IRAM_ATTR CTimer::isr3() { if (instances[3]) instances[3]->onTimer(); }
+// Static ISR wrappers that call the pTimerCallbackFunction() method of the correct
+// instance based on the timer ID
+void IRAM_ATTR CTimer::isr0() {
+    if (instances[0] && instances[0]->pTimerCallbackFunction)
+        instances[0]->pTimerCallbackFunction();
+}
+void IRAM_ATTR CTimer::isr1() { 
+    if (instances[1] && instances[1]->pTimerCallbackFunction) 
+        instances[1]->pTimerCallbackFunction();
+}
+void IRAM_ATTR CTimer::isr2() { 
+    if (instances[2] && instances[2]->pTimerCallbackFunction) 
+        instances[2]->pTimerCallbackFunction(); 
+}
+void IRAM_ATTR CTimer::isr3() { 
+    if (instances[3] && instances[3]->pTimerCallbackFunction) 
+        instances[3]->pTimerCallbackFunction(); 
+}
 
 
 
