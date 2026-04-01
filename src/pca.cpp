@@ -41,9 +41,31 @@ void CServo::allChannelsOff() {
         pPwmDriver->setPWM(i, 0, 0);
     }
 }
-void CServo::setPWM(PWMChannel channel, uint16_t on, uint16_t off) {
+void CServo::setPWM(PWMChannel channel, uint16_t ui16ValueOn, uint16_t ui16ValueOff) {
     if (pPwmDriver == nullptr) {
         return;
     }
-    pPwmDriver->setPWM(channel, on, off);
+    pPwmDriver->setPWM(channel, ui16ValueOn, ui16ValueOff);
+}
+
+void CServo::setPWM(PWMChannel channel, uint16_t ui16Value, bool boInvert) {
+    if (pPwmDriver == nullptr) {
+        return;
+    }
+    pPwmDriver->setPin(channel, ui16Value, boInvert);
+}
+
+void CServo::setPWM(PWMChannel channel, uint8_t ui8Percent, bool boInvert) {
+    if (pPwmDriver == nullptr) {
+        return;
+    }
+    uint16_t ui16Value = (ui8Percent * 4095) / 100; // Convert percentage to a value between 0 and 4095
+    pPwmDriver->setPin(channel, ui16Value, boInvert);
+}
+
+void CServo::setPWMFreq(float fFreq) {
+    if (pPwmDriver == nullptr) {
+        return;
+    }
+    pPwmDriver->setPWMFreq(fFreq);
 }

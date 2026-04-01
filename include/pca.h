@@ -22,7 +22,10 @@ public:
 
     bool isPresent();
     bool begin();
-    void setPWM(PWMChannel channel, uint16_t on, uint16_t off);
+    void setPWM(PWMChannel channel, uint16_t ui16ValueOn, uint16_t ui16ValueOff);
+    void setPWM(PWMChannel channel, uint16_t ui16Value, bool boInvert = false);
+    void setPWM(PWMChannel channel, uint8_t ui8Percent, bool boInvert = false);
+    void setPWMFreq(float fFreq);
     void allChannelsOff();
 
 private:
