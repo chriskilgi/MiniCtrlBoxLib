@@ -16,6 +16,8 @@ bool CServo::isPresent() {
 }
 
 bool CServo::begin() {
+    Wire.begin(); // Initialize I2C communication
+    
     if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {

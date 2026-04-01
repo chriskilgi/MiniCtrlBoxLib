@@ -2,7 +2,7 @@
 
 CEeprom::CEeprom(uint8_t deviceAddress) : eeprom(deviceAddress, I2C_DEVICESIZE_24LC02)
 {
-    eeprom.begin();
+
 }
 
 bool CEeprom::isPresent()

@@ -15,6 +15,10 @@ struct TEEPROM {
 class CEeprom {
 public:
     CEeprom(uint8_t deviceAddress = EEPROM_ADRESS);
+    bool begin() {
+        Wire.begin(); // Initialize I2C communication
+        return eeprom.begin();
+    }
     bool isPresent();
     uint8_t getAddress();
 

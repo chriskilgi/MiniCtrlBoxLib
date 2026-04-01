@@ -6,6 +6,7 @@ COLed::COLed(TwoWire& wire, int8_t rst) : display(WIDTH, HEIGHT, &wire, rst) {
 
 // Initialising the display and returning true if successful, false otherwise
 bool COLed::begin() {
+        Wire.begin();
         if (!display.begin(SSD1306_SWITCHCAPVCC, DISPLAY_ADDRESS)) {
             boIsPresent = false;
             return false;

@@ -12,11 +12,15 @@ class CMCP {
         ~CMCP();
 
         // Pure virtual function to be implemented by derived classes for specific initialization
-        virtual bool begin() = 0; 
-
+        bool begin() {
+            Wire.begin(); // Initialize I2C communication
+            return onBegin(); // Call the derived class's specific initialization
+        } 
+        
         bool isPresent(); // Check if the MCP23017 is present on the I2C bus
 
     protected:
+        virtual bool onBegin() = 0; // Pure virtual function for derived class initialization
         uint8_t ui8MCPAddress; // I2C address of the MCP23017
         MCP23017 *pMCP; // Pointer to the MCP23017 instance, initialized in derived classes if the device is present
 };
@@ -39,12 +43,12 @@ class CPortExpLoc : public CMCP {
         CPortExpLoc(uint8_t ui8MCPAddress = MCP_LOCAL_ADDRESS);
         ~CPortExpLoc();
 
-        bool begin() override;
-
         // Function to set the state of the RGB LEDs based on the specified color and state
         void setColor(RGBLEDColor tLEDColor, bool boState);
         // Overloaded function to set the state of the RGB LEDs based on a color index (0-5) and state
         void setColor(uint8_t ui8Color, bool boState);
+    protected:
+        bool onBegin() override; // Implementation of the pure virtual function for specific initialization of the Mainboard's MCP23017
 };
 
 // The CMCPSLB class inherits from CMCP and provides specific functionality for controlling
@@ -65,8 +69,6 @@ class CPortExpRem : public CMCP {
         };
         CPortExpRem(uint8_t ui8MCPAddress = MCP_SLB_ADDRESS);
         ~CPortExpRem();
-
-        bool begin() override;
         
         void setLED(LEDColor tLEDColor, bool boState);
         void setLED(uint8_t ui8LED, bool boState);
@@ -74,6 +76,8 @@ class CPortExpRem : public CMCP {
 
         uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard
         bool getSwitchState(uint8_t ui8SwitchNo); // Overloaded function to check if specific switches are pressed based on a switch index (0-7)
+    protected:
+        bool onBegin() override; // Implementation of the pure virtual function for specific initialization of the
 };
 
 // Bitwise OR operator overload for RGBLEDColor combining LED colors

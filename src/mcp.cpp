@@ -31,7 +31,7 @@ CPortExpLoc::~CPortExpLoc() {
 }
 
 // The begin function initializes the MCP23017 and sets the pin modes for the RGB LEDs
-bool CPortExpLoc::begin() {
+bool CPortExpLoc::onBegin() {
     if (!gloIsI2CDevicePresent(ui8MCPAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
@@ -83,7 +83,7 @@ CPortExpRem::~CPortExpRem() {
 }
 
 // The begin function initializes the MCP23017 and sets the pin modes for the LEDs and switches
-bool CPortExpRem::begin() {
+bool CPortExpRem::onBegin() {
     if (!gloIsI2CDevicePresent(ui8MCPAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
     } else {
