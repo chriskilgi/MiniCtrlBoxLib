@@ -32,7 +32,15 @@ public:
     
     void outputEnable(bool boEnable);
 
+    uint16_t getPotiVoltageDigital();
+    float getPotiVoltageAnalog();
+    uint16_t getPotiVoltagePercent();
+    // For a more precise voltage reading, you can use the following function
+    // to convert the ADC value to voltage based on the reference voltage (to be measured and set by the user)
+    void setReferenceVoltage(float fVoltage) { fRefVoltage = fVoltage; } // Setter for reference voltage
+
 private:
     Adafruit_PWMServoDriver *pPwmDriver;
     uint8_t deviceAddress;
+    float fRefVoltage = 3.3; // Reference voltage for ADC conversion (adjust if using a different reference voltage)
 };

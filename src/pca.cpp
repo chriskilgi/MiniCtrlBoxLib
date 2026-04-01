@@ -87,3 +87,22 @@ void CServo::outputEnable(bool boEnable) {
     }
     digitalWrite(GPIO_NUM_7, boEnable ? LOW : HIGH); // Set OE pin low to enable, high to disable
 }
+
+// Read the voltage from the potentiometer connected to GPIO 5 and return it
+// as a 16-bit value (0-4095 for a 12-bit ADC)
+uint16_t CServo::getPotiVoltageDigital() {
+    return analogRead(GPIO_NUM_5); 
+}
+
+// Read the voltage from the potentiometer and return it as a float value in volts
+// Assuming a reference voltage of 3.3V and a 12-bit ADC, the raw ADC value (0-4095) is converted to a voltage by multiplying it by the reference voltage and dividing by the maximum ADC value
+float CServo::getPotiVoltageAnalog() {
+    uint16_t rawValue = getPotiVoltageDigital(); // Get the raw ADC value
+    return (rawValue * fRefVoltage) / 4095; // Convert the raw value to a voltage (0-3.3V)
+}
+
+// Read the voltage from the potentiometer and return it as a percentage (0-100%)
+uint16_t CServo::getPotiVoltagePercent() {
+    uint16_t rawValue = getPotiVoltageDigital(); // Get the raw ADC value (0-4095)
+    return (rawValue * 100) / 4095; // Convert the raw value to a percentage
+}
