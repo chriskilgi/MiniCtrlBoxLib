@@ -24,8 +24,8 @@ bool CServo::begin() {
         pPwmDriver = new Adafruit_PWMServoDriver(deviceAddress); // Create an instance of the Adafruit_PWMServoDriver with the specified base address
     }
 
-    pinMode(GPIO_NUM_7, OUTPUT); // Set GPIO 7 as OE pin for the PCA9685 PWM driver
-    digitalWrite(GPIO_NUM_7, LOW); // Set OE pin low to enable the PCA9685 PWM driver
+    pinMode(GPIO_NUM_7, OUTPUT); // Set GPIO 7 as an output for controlling the OE pin of the PCA9685
+    outputEnable(true); // Enable the output of the PCA9685 by setting the OE pin low
 
     pPwmDriver->begin(); // Initialize the PCA9685 PWM driver
     delay(200); // Wait for the PCA9685 to initialize properly
@@ -78,6 +78,9 @@ void CServo::setPWMFreq(float fFreq) {
 }
 
 // Method to enable or disable the output of the PCA9685 by controlling the OE pin
+// The OE pin is active low, meaning that setting it LOW enables the outputs, while setting it HIGH disables them
+// This method allows for quickly turning off all outputs without having to set each channel to 0
+// The default state is enabled (outputs active) when the begin() method is called, but this method can be used to disable the outputs when needed (e.g., for power saving or safety reasons)   
 void CServo::outputEnable(bool boEnable) {
     if (pPwmDriver == nullptr) {
         return;
