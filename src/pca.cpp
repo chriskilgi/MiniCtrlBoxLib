@@ -28,6 +28,8 @@ bool CServo::begin() {
     digitalWrite(GPIO_NUM_7, LOW); // Set OE pin low to enable the PCA9685 PWM driver
 
     pPwmDriver->begin(); // Initialize the PCA9685 PWM driver
+    delay(200); // Wait for the PCA9685 to initialize properly
+
     pPwmDriver->setPWMFreq(1000); // Set frequency to 1 kHz for LED dimming
 
     return true;
@@ -55,7 +57,7 @@ void CServo::setPWM(PWMChannel channel, uint16_t ui16Value, bool boInvert) {
     pPwmDriver->setPin(channel, ui16Value, boInvert);
 }
 
-void CServo::setPWM(PWMChannel channel, uint8_t ui8Percent, bool boInvert) {
+void CServo::setPWMPercent(PWMChannel channel, uint8_t ui8Percent, bool boInvert) {
     if (pPwmDriver == nullptr) {
         return;
     }
@@ -63,9 +65,22 @@ void CServo::setPWM(PWMChannel channel, uint8_t ui8Percent, bool boInvert) {
     pPwmDriver->setPin(channel, ui16Value, boInvert);
 }
 
+// Method to set the PWM frequency for the PCA9685
+// The PCA9685 supports a frequency range of approximately 24 Hz to 1526 Hz, so the input frequency should be within this range for proper operation
+// For LED dimming applications, a common frequency is around 1 kHz, which provides smooth dimming without visible flicker
+// The default frequency is set to 1 kHz in the begin() method, but this method allows
+// changing it as needed for different applications (e.g., servos may require a different frequency than LEDs)
 void CServo::setPWMFreq(float fFreq) {
     if (pPwmDriver == nullptr) {
         return;
     }
     pPwmDriver->setPWMFreq(fFreq);
+}
+
+// Method to enable or disable the output of the PCA9685 by controlling the OE pin
+void CServo::outputEnable(bool boEnable) {
+    if (pPwmDriver == nullptr) {
+        return;
+    }
+    digitalWrite(GPIO_NUM_7, boEnable ? LOW : HIGH); // Set OE pin low to enable, high to disable
 }

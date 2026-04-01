@@ -20,13 +20,17 @@ public:
     CServo(uint8_t baseAddress = PCA_ADDRESS);
     ~CServo();
 
-    bool isPresent();
     bool begin();
+    bool isPresent();
+
     void setPWM(PWMChannel channel, uint16_t ui16ValueOn, uint16_t ui16ValueOff);
     void setPWM(PWMChannel channel, uint16_t ui16Value, bool boInvert = false);
-    void setPWM(PWMChannel channel, uint8_t ui8Percent, bool boInvert = false);
+    void setPWMPercent(PWMChannel channel, uint8_t ui8Percent, bool boInvert = false);
     void setPWMFreq(float fFreq);
+
     void allChannelsOff();
+    
+    void outputEnable(bool boEnable);
 
 private:
     Adafruit_PWMServoDriver *pPwmDriver;
