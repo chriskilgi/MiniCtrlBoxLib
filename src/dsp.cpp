@@ -84,6 +84,8 @@ void COLed::printfAt(uint8_t row, uint8_t col, const char* fmt, ...) {
 // Prints formatted text to a specific line, starting at column 0
 // Example usage: printfLine(2, "Temperature: %.1f C", temperature);
 void COLed::printfLine(uint8_t row, const char* fmt, ...) {
+    if (row >= ROWS) return;
+    
     char buffer[64];
 
     va_list args;
