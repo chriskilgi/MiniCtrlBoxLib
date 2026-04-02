@@ -7,6 +7,9 @@
 
 class CServo {
 public:
+    // The PWMChannel enum defines the identifiers for the 8 PWM channels of the PCA9685.
+    // The first 6 channels (0-5) are used for controlling the RGB LEDs,
+    // while the last 2 channels (6-7) are used for controlling the two servos
     enum PWMChannel : uint8_t {
         RED0 = 0,
         GREEN0 = 1,
@@ -17,27 +20,40 @@ public:
         SERVO1 = 6,
         SERVO2 = 7
     };
+    // The SensorPin enum defines the identifiers for the two sensors connected to the servo board.
+    // These identifiers can be used in the getServoSensorDigital and getServoSensorAnalog methods
+    // to specify which sensor's state or voltage to read. 
+    enum SensorPin : uint8_t {
+        SENSOR1 = 1,
+        SENSOR2 = 2
+    };
+
     CServo(uint8_t baseAddress = PCA_ADDRESS);
     ~CServo();
 
     bool begin();
     bool isPresent();
 
+    // Functions for setting PWM values
     void setPWM(PWMChannel channel, uint16_t ui16ValueOn, uint16_t ui16ValueOff);
     void setPWM(PWMChannel channel, uint16_t ui16Value, bool boInvert = false);
     void setPWMPercent(PWMChannel channel, uint8_t ui8Percent, bool boInvert = false);
     void setPWMFreq(float fFreq);
 
     void allChannelsOff();
-    
     void outputEnable(bool boEnable);
 
+    // Functions for reading potentiometer voltage
     uint16_t getPotiVoltageDigital();
     float getPotiVoltageAnalog();
-    uint16_t getPotiVoltagePercent();
+    float getPotiVoltagePercent();
     // For a more precise voltage reading, you can use the following function
     // to convert the ADC value to voltage based on the reference voltage (to be measured and set by the user)
     void setReferenceVoltage(float fVoltage) { fRefVoltage = fVoltage; } // Setter for reference voltage
+
+    // Functions for reading servo sensor states
+    bool getServoSensorDigital(SensorPin ui8SensorPin);
+    float getServoSensorAnalog(SensorPin ui8SensorPin);
 
 private:
     Adafruit_PWMServoDriver *pPwmDriver;

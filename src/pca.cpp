@@ -102,7 +102,32 @@ float CServo::getPotiVoltageAnalog() {
 }
 
 // Read the voltage from the potentiometer and return it as a percentage (0-100%)
-uint16_t CServo::getPotiVoltagePercent() {
+float CServo::getPotiVoltagePercent() {
     uint16_t rawValue = getPotiVoltageDigital(); // Get the raw ADC value (0-4095)
-    return (rawValue * 100) / 4095; // Convert the raw value to a percentage
+    return (rawValue * 100.0) / 4095.0; // Convert the raw value to a percentage
+}
+
+bool CServo::getServoSensorDigital(SensorPin ui8SensorPin) {
+    switch (ui8SensorPin) {
+        case SENSOR1:
+            return digitalRead(GPIO_NUM_0); // Sensor 1 connected to GPIO 0
+        case SENSOR2:
+            return digitalRead(GPIO_NUM_1); // Sensor 2 connected to GPIO 1
+        default:
+            return false; // Return false for invalid sensor pin
+    }
+}
+
+float CServo::getServoSensorAnalog(SensorPin ui8SensorPin) {
+    uint16_t rawValue;
+    switch (ui8SensorPin) {
+        case SENSOR1:
+            rawValue = analogRead(GPIO_NUM_0); // Sensor 1 connected to GPIO 0
+            return (rawValue * fRefVoltage) / 4095; // Convert the raw value to a voltage (0-3.3V)
+        case SENSOR2:
+            rawValue = analogRead(GPIO_NUM_1); // Sensor 2 connected to GPIO 1
+            return (rawValue * fRefVoltage) / 4095; // Convert the raw value to a voltage (0-3.3V)
+        default:
+            return 0.0; // Return 0 for invalid sensor pin
+    }
 }
