@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <can.h>
 
 CCanBus::CCanBus(gpio_num_t txPin, gpio_num_t rxPin, uint32_t bitrate)
@@ -73,3 +74,8 @@ twai_timing_config_t CCanBus::timingFromBitrate(uint32_t bitrate) {
         default:      return TWAI_TIMING_CONFIG_500KBITS();
     }
 }
+
+void CCanBus::setCANTermination(bool boTermination) {
+    digitalWrite(PIN_SSR, boTermination);
+}
+

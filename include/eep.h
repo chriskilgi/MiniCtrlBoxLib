@@ -4,7 +4,7 @@
 
 #define EEPROM_ADRESS 0x50
 
-struct TEEPROM {
+struct TEEPROM {   
   uint8_t ui8ID;                    // z.B. 1
   char acProjektbezeichnung[20];    // z.B. "MiniCtrlBox"
   char acBoardbezeichnung[20];      // z.B. "Mainboard"

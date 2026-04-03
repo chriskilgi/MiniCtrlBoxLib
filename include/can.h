@@ -2,6 +2,8 @@
 #include <driver/twai.h>
 #include <driver/gpio.h>
 
+#define PIN_SSR GPIO_NUM_2 // GPIO pin connected to the SSR (Solid State Relay)
+
 class CCanBus {
 public:
     struct Frame {
@@ -18,6 +20,9 @@ public:
 
     bool transmit(const Frame& frame, uint32_t timeoutMs = 100);
     bool receive(Frame& outFrame, uint32_t timeoutMs = 100);
+
+    // Control CAN bus termination using the SSR
+    void setCANTermination(bool boTermination);
 
 private:
     gpio_num_t txPin;
