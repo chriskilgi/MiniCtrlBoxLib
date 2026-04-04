@@ -5,11 +5,28 @@ CCanBus::CCanBus(gpio_num_t txPin, gpio_num_t rxPin, uint32_t bitrate)
     : txPin(txPin), rxPin(rxPin), bitrate(bitrate), running(false)
 {
     setCANTermination(false); // Ensure CAN bus termination is disabled at startup
+
 }
 
 CCanBus::~CCanBus() {
     stop();
     twai_driver_uninstall();
+}
+
+// Check if the CAN controller is in bus-off state
+bool busOffDetected() {
+    uint32_t alerts;
+    if (twai_read_alerts(&alerts, 0) == ESP_OK) {
+        return (alerts & TWAI_ALERT_BUS_OFF) != 0;
+    }
+    return false;
+}
+
+// Restart the CAN controller by stopping and starting it again
+void restart() {
+    twai_stop();
+    twai_driver_uninstall();
+    start();
 }
 
 bool CCanBus::start() {
@@ -18,6 +35,12 @@ bool CCanBus::start() {
 
     twai_general_config_t g_config =
         TWAI_GENERAL_CONFIG_DEFAULT(txPin, rxPin, TWAI_MODE_NORMAL);
+
+    g_config.alerts_enabled =
+        TWAI_ALERT_TX_FAILED
+        | TWAI_ALERT_BUS_OFF
+        | TWAI_ALERT_TX_SUCCESS;
+  
 
     twai_timing_config_t t_config = timingFromBitrate(bitrate);
     twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();

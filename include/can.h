@@ -15,6 +15,9 @@ public:
     CCanBus(gpio_num_t txPin = GPIO_NUM_21, gpio_num_t rxPin = GPIO_NUM_20, uint32_t bitrate = 500000);
     ~CCanBus();
 
+    bool busOffDetected(); // Check if the CAN bus is in a bus-off state
+    void restart(); // Restart the CAN controller
+
     bool start();
     void stop();
 
