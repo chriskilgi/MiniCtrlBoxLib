@@ -1,6 +1,6 @@
 {
   "name": "MiniCtrlBoxLib",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "High-level hardware abstraction library for the MiniCtrlBox (OLED, EEPROM, MCP23017, Buttons, CAN, etc.)",
   "keywords": [
     "oled",

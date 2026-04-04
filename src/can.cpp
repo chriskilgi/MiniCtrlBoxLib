@@ -14,7 +14,7 @@ CCanBus::~CCanBus() {
 }
 
 // Check if the CAN controller is in bus-off state
-bool busOffDetected() {
+bool CCanBus::busOffDetected() {
     uint32_t alerts;
     if (twai_read_alerts(&alerts, 0) == ESP_OK) {
         return (alerts & TWAI_ALERT_BUS_OFF) != 0;
@@ -23,10 +23,10 @@ bool busOffDetected() {
 }
 
 // Restart the CAN controller by stopping and starting it again
-void restart() {
+void CCanBus::restart() {
     twai_stop();
     twai_driver_uninstall();
-    start();
+    this->start();
 }
 
 bool CCanBus::start() {
