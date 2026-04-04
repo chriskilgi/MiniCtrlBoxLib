@@ -24,7 +24,7 @@ bool CCanBus::busOffDetected() {
 
 // Restart the CAN controller by stopping and starting it again
 void CCanBus::restart() {
-    twai_stop();
+    this->stop();
     twai_driver_uninstall();
     this->start();
 }
