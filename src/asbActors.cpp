@@ -2,9 +2,9 @@
 
 CASBActors::CASBActors() {
     // Initialize the pins for the actors
-    pinmode(PIN_ASB_ACTORS_BUZZER, OUTPUT);
-    pinmode(PIN_ASB_ACTORS_RELAIS, OUTPUT);
-    pinmode(PIN_ASB_ACTORS_LED, OUTPUT);
+    pinMode(PIN_ASB_ACTORS_BUZZER, OUTPUT);
+    pinMode(PIN_ASB_ACTORS_RELAIS, OUTPUT);
+    pinMode(PIN_ASB_ACTORS_LED, OUTPUT);
 
     // Set all actors to a known state (off)
     digitalWrite(PIN_ASB_ACTORS_BUZZER, LOW);
