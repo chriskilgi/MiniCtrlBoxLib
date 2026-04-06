@@ -11,5 +11,3 @@ CASBActors::CASBActors() {
     digitalWrite(PIN_ASB_ACTORS_RELAIS, LOW);
     digitalWrite(PIN_ASB_ACTORS_LED, LOW);
 }
-
-
