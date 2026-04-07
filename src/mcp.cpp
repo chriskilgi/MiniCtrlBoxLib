@@ -133,10 +133,16 @@ void CPortExpRem::setLEDPort(uint8_t ui8PortState) {
 
 // Function to read the state of the switches on the SwitchLEDBoard
 uint8_t CPortExpRem::getSwitchState() {
+    if(pMCP == nullptr) {
+        return 0; // If the MCP instance is not initialized, exit the function
+    }
     return pMCP->getPort(B); // Read and return the state of the switches from port B
 }
 
 bool CPortExpRem::getSwitchState(uint8_t ui8SwitchNo) {
+    if(pMCP == nullptr) {
+        return false; // If the MCP instance is not initialized, exit the function
+    }
     if (ui8SwitchNo >= 0 && ui8SwitchNo <= 7) {
         return pMCP->getPin(ui8SwitchNo, B); // Read and return the state of the specified switch from port B
     }
