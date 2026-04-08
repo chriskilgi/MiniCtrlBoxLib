@@ -27,7 +27,7 @@ CPortExpLoc::CPortExpLoc(uint8_t ui8MCPAddress) : CMCP(ui8MCPAddress) {
 }
 
 CPortExpLoc::~CPortExpLoc() {
-    // The destructor of CMCP will clean up the MCP23017 instance
+    // The destructor of the parent class CMCP will clean up the MCP23017 instance
 }
 
 // The begin function initializes the MCP23017 and sets the pin modes for the RGB LEDs
@@ -42,6 +42,7 @@ bool CPortExpLoc::onBegin() {
     delay(10); // Short delay to ensure the MCP23017 is ready after initialization
     pMCP->setPortMode(0xFF, B); // Set all pins of port B as outputs (for RGB LEDs)
     pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (as they are not used for the RGB LEDs, we can set them as outputs to avoid floating inputs)
+    pMCP->setPort(0x01, A); 
     return true;
 }
 

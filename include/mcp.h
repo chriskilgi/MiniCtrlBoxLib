@@ -11,7 +11,6 @@ class CMCP {
         CMCP(uint8_t ui8MCPAddress);
         ~CMCP();
 
-        // Pure virtual function to be implemented by derived classes for specific initialization
         bool begin() {
             Wire.begin(); // Initialize I2C communication
             return onBegin(); // Call the derived class's specific initialization
@@ -48,7 +47,7 @@ class CPortExpLoc : public CMCP {
         // Overloaded function to set the state of the RGB LEDs based on a color index (0-5) and state
         void setColor(uint8_t ui8Color, bool boState);
     protected:
-        bool onBegin() override; // Implementation of the pure virtual function for specific initialization of the Mainboard's MCP23017
+        bool onBegin();
 };
 
 // The CMCPSLB class inherits from CMCP and provides specific functionality for controlling
@@ -77,7 +76,7 @@ class CPortExpRem : public CMCP {
         uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard
         bool getSwitchState(uint8_t ui8SwitchNo); // Overloaded function to check if specific switches are pressed based on a switch index (0-7)
     protected:
-        bool onBegin() override; // Implementation of the pure virtual function for specific initialization of the
+        bool onBegin();
 };
 
 // Bitwise OR operator overload for RGBLEDColor combining LED colors

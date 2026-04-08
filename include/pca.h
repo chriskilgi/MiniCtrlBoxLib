@@ -2,7 +2,7 @@
 #include <Adafruit_PWMServoDriver.h>
 
 #define PCA_ADDRESS 0x40 // Base address for PCA9685 (plus the 3 address pins A0, A1, A2 via MCP23017)
-
+#define PIN_OUTPUT_ENABLE GPIO_NUM_7 // GPIO pin used to control the OE pin of the PCA9685
 
 
 class CServo {
@@ -28,7 +28,7 @@ public:
         SENSOR2 = 2
     };
 
-    CServo(uint8_t baseAddress = PCA_ADDRESS);
+    CServo();
     ~CServo();
 
     bool begin();
@@ -56,7 +56,6 @@ public:
     float getServoSensorAnalog(SensorPin ui8SensorPin);
 
 private:
-    Adafruit_PWMServoDriver *pPwmDriver;
-    uint8_t deviceAddress;
+    Adafruit_PWMServoDriver *pPwmDriver; // Pointer to the PCA9685 driver instance, initialized in begin() if the device is present
     float fRefVoltage = 3.3; // Reference voltage for ADC conversion (adjust if using a different reference voltage)
 };

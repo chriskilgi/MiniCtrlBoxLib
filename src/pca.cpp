@@ -1,14 +1,15 @@
 #include <glo.h>
 #include <pca.h>
 
-CServo::CServo(uint8_t baseAddress) {
+CServo::CServo() {
     pPwmDriver = nullptr; // Initialize the PWM driver pointer to nullptr
-    this->deviceAddress = baseAddress; // Store the base address for later use in case we need to reinitialize the driver
 }
 
 CServo::~CServo() {
-    delete pPwmDriver;
-    pPwmDriver = nullptr;
+    if (pPwmDriver != nullptr) {
+        delete pPwmDriver; // Clean up the PWM driver instance
+        pPwmDriver = nullptr; // Set the pointer to nullptr after deletion
+    }
 }
 
 bool CServo::isPresent() {
@@ -18,13 +19,13 @@ bool CServo::isPresent() {
 bool CServo::begin() {
     Wire.begin(); // Initialize I2C communication
     
-    if (!gloIsI2CDevicePresent(deviceAddress)) { // Check if the MCP23017 device is present at the specified I2C address
-        return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
+    if (!gloIsI2CDevicePresent(PCA_ADDRESS)) { // Check if the PCA9685 device is present at the specified I2C address
+        return false; // If the device is not present, exit the function (pPwmDriver will remain nullptr to indicate that the device is not available)
     } else {
-        pPwmDriver = new Adafruit_PWMServoDriver(deviceAddress); // Create an instance of the Adafruit_PWMServoDriver with the specified base address
+        pPwmDriver = new Adafruit_PWMServoDriver(PCA_ADDRESS); // Create an instance of the Adafruit_PWMServoDriver with the specified base address
     }
 
-    pinMode(GPIO_NUM_7, OUTPUT); // Set GPIO 7 as an output for controlling the OE pin of the PCA9685
+    pinMode(PIN_OUTPUT_ENABLE, OUTPUT); // Set the OE pin as an output
     outputEnable(true); // Enable the output of the PCA9685 by setting the OE pin low
 
     pPwmDriver->begin(); // Initialize the PCA9685 PWM driver
@@ -85,7 +86,7 @@ void CServo::outputEnable(bool boEnable) {
     if (pPwmDriver == nullptr) {
         return;
     }
-    digitalWrite(GPIO_NUM_7, boEnable ? LOW : HIGH); // Set OE pin low to enable, high to disable
+    digitalWrite(PIN_OUTPUT_ENABLE, boEnable ? LOW : HIGH); // Set OE pin low to enable, high to disable
 }
 
 // Read the voltage from the potentiometer connected to GPIO 5 and return it
