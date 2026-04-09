@@ -90,8 +90,10 @@ uint16_t CServo::angleToMicroseconds(float angle) {
   if (angle < 0) angle = 0;
   if (angle > 180) angle = 180;
 
-  // Umrechnung: 0° → 500 µs, 180° → 2500 µs
-  return 480 + (angle / 180.0f) * 2090.0f;
+  // Calculate the pulse width in microseconds based on the angle, using a linear mapping between the minimum and maximum pulse widths defined for the servo
+  // Normally, the values 500 and 2500 are used for standard servos, but they can be adjusted if your specific servo has different timing requirements
+  // The values can be adjusted using the setMinMaxServoMicroseconds method to ensure compatibility with different servo models
+  return ui16ServoTimeMin + (angle / 180.0f) * (ui16ServoTimeMax - ui16ServoTimeMin);
 }
 
 // Method to enable or disable the output of the PCA9685 by controlling the OE pin

@@ -41,6 +41,7 @@ public:
     void setPWMFreq(float fFreq);
     void setMicroseconds(PWMChannel channel, uint16_t ui16Microseconds);
     uint16_t angleToMicroseconds(float angle);
+    void setMinMaxServoMicroseconds(uint16_t ui16Min, uint16_t ui16Max) { ui16ServoTimeMin = ui16Min; ui16ServoTimeMax = ui16Max; } // Setter for minimum and maximum pulse widths for the servo
 
     void allChannelsOff();
     void outputEnable(bool boEnable);
@@ -60,4 +61,6 @@ public:
 private:
     Adafruit_PWMServoDriver *pPwmDriver; // Pointer to the PCA9685 driver instance, initialized in begin() if the device is present
     float fRefVoltage = 3.3; // Reference voltage for ADC conversion (adjust if using a different reference voltage)
+    uint16_t ui16ServoTimeMin = 500; // Minimum pulse width in microseconds (0.5 ms)
+    uint16_t ui16ServoTimeMax = 2500; // Maximum pulse width in microseconds (2.5 ms)
 };
