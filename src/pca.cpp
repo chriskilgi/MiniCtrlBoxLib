@@ -78,6 +78,22 @@ void CServo::setPWMFreq(float fFreq) {
     pPwmDriver->setPWMFreq(fFreq);
 }
 
+void CServo::setMicroseconds(PWMChannel channel, uint16_t ui16Microseconds) {
+    if (pPwmDriver == nullptr) {
+        return;
+    }
+    pPwmDriver->writeMicroseconds(channel, ui16Microseconds);
+}
+
+uint16_t CServo::angleToMicroseconds(float angle) {
+  // Begrenzen auf 0–180°
+  if (angle < 0) angle = 0;
+  if (angle > 180) angle = 180;
+
+  // Umrechnung: 0° → 500 µs, 180° → 2500 µs
+  return 480 + (angle / 180.0f) * 2090.0f;
+}
+
 // Method to enable or disable the output of the PCA9685 by controlling the OE pin
 // The OE pin is active low, meaning that setting it LOW enables the outputs, while setting it HIGH disables them
 // This method allows for quickly turning off all outputs without having to set each channel to 0

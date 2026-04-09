@@ -39,6 +39,8 @@ public:
     void setPWM(PWMChannel channel, uint16_t ui16Value, bool boInvert = false);
     void setPWMPercent(PWMChannel channel, uint8_t ui8Percent, bool boInvert = false);
     void setPWMFreq(float fFreq);
+    void setMicroseconds(PWMChannel channel, uint16_t ui16Microseconds);
+    uint16_t angleToMicroseconds(float angle);
 
     void allChannelsOff();
     void outputEnable(bool boEnable);
