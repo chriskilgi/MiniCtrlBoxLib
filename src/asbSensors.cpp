@@ -4,6 +4,7 @@ CASBSensors::CASBSensors() {
     // Initialize the AHT20 sensor pointer to nullptr
     // (indicating that the sensor is not initiaLlized or not present)
     pAHT20 = nullptr; 
+    pMLX90393 = nullptr;
 }
 
 
@@ -38,6 +39,30 @@ bool CASBSensors::initAHT20() {
     }
 
     return boSensorFound;
+}
+
+bool CASBSensors::initMLX90393() {
+    bool boSensorFound = false;
+
+    pMLX90393 = new MLX90393();
+    if (pMLX90393->begin_I2C()) {
+        boSensorFound = true;
+    } else {
+        delete pMLX90393;
+        pMLX90393 = nullptr;
+    }
+
+    return boSensorFound;
+}
+
+TMLX90393Data CASBSensors::getMLX90393Data() {
+    TMLX90393Data data = {0.0f, 0.0f, 0.0f}; // Default values if the sensor is not installed
+
+    if (pMLX90393) {
+        pMLX90393->readData(&data.x, &data.y, &data.z); // Read the magnetic field data from the sensor
+    }
+
+    return data;
 }
 
 // Read the voltage from the potentiometer connected to GPIO 5 and return it
