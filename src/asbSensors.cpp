@@ -44,7 +44,7 @@ bool CASBSensors::initAHT20() {
 bool CASBSensors::initMLX90393() {
     bool boSensorFound = false;
 
-    pMLX90393 = new MLX90393();
+    pMLX90393 = new Adafruit_MLX90393();
     if (pMLX90393->begin_I2C()) {
         boSensorFound = true;
     } else {

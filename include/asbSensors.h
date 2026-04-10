@@ -32,6 +32,6 @@ public:
 
 private:
     AHT20 *pAHT20; // Pointer to the AHT20 sensor object, or nullptr if the sensor is not installed
-    MLX90393 *pMLX90393; // Pointer to the MLX90393 sensor object, or nullptr if the sensor is not installed
+    Adafruit_MLX90393 *pMLX90393; // Pointer to the MLX90393 sensor object, or nullptr if the sensor is not installed
     float fRefVoltage = 3.3f; // Default reference voltage for the potentiometer readings
 };
