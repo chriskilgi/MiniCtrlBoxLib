@@ -55,7 +55,7 @@ bool CASBSensors::initMLX90393() {
     return boSensorFound;
 }
 
-TMLX90393Data CASBSensors::getMLX90393Data() {
+CASBSensors::TMLX90393Data CASBSensors::getMLX90393Data() {
     TMLX90393Data data = {0.0f, 0.0f, 0.0f}; // Default values if the sensor is not installed
 
     if (pMLX90393) {
