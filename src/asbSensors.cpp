@@ -44,8 +44,8 @@ bool CASBSensors::initAHT20() {
 bool CASBSensors::initMLX90393() {
     bool boSensorFound = false;
 
-    pMLX90393 = new Adafruit_MLX90393();
-    if (pMLX90393->begin_I2C()) {
+    pMLX90393 = new MLX90393_7Semi();
+    if (pMLX90393->begin(0x0C, Wire, 100000)) {
         boSensorFound = true;
     } else {
         delete pMLX90393;
@@ -56,13 +56,15 @@ bool CASBSensors::initMLX90393() {
 }
 
 CASBSensors::TMLX90393Data CASBSensors::getMLX90393Data() {
-    TMLX90393Data data = {0.0f, 0.0f, 0.0f}; // Default values if the sensor is not installed
+    CASBSensors::TMLX90393Data tMagneticData = {0.0f, 0.0f, 0.0f}; // Default values if the sensor is not installed
 
-    if (pMLX90393) {
-        pMLX90393->readData(&data.x, &data.y, &data.z); // Read the magnetic field data from the sensor
+    if (!pMLX90393) {
+        return tMagneticData; // Return default values if the sensor is not installed
+    } else {
+        // Read the magnetic field data from the MLX90393 sensor and store it in the data struct
+        pMLX90393->readMag(tMagneticData.x, tMagneticData.y, tMagneticData.z);
     }
-
-    return data;
+    return tMagneticData;
 }
 
 // Read the voltage from the potentiometer connected to GPIO 5 and return it
