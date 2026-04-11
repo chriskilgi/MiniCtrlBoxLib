@@ -65,8 +65,8 @@ namespace nspMiniCtrlBox {
         void setHWVersion(const char* pcVersion);
         void setSWVersion(const char* pcVersion);
 
-        bool writeUserData(const uint8_t * pcBuffer, uint16_t ui16Length);
-        bool readUserData(uint8_t * pcBuffer, uint16_t ui16Length);
+        bool writeUserData(const void* pvBuffer, uint16_t ui16Length);
+        bool readUserData(const void* pvBuffer, uint16_t ui16Length);
     private:
         I2C_eeprom eeprom;
         TEEPROM tDeviceInfo; // Local copy of the device info for easy access

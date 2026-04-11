@@ -48,23 +48,23 @@ void CEeprom::setSWVersion(const char* pcVersion) {
     writeDeviceInfo(&tDeviceInfo); // Write the updated device info back to EEPROM
 }
 
-bool CEeprom::writeUserData(const uint8_t * pcBuffer, uint16_t ui16Length) {
+bool CEeprom::writeUserData(const void* pvBuffer, uint16_t ui16Length) {
     // Write user data starting from address sizeof(TEEPROM) to avoid overwriting device info
     if (ui16Length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
         // Handle error: not enough space to write user data
         return false;
     }
-    eeprom.writeBlock(sizeof(TEEPROM), pcBuffer, ui16Length);
+    eeprom.writeBlock(sizeof(TEEPROM), (uint8_t*)pvBuffer, ui16Length);
     return true;
 }
 
-bool CEeprom::readUserData(uint8_t * pcBuffer, uint16_t ui16Length) {
+bool CEeprom::readUserData(const void* pvBuffer, uint16_t ui16Length) {
     // Read user data starting from address sizeof(TEEPROM) to avoid reading device info
     if (ui16Length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
         // Handle error: not enough space to read user data
         return false;
     }
-    eeprom.readBlock(sizeof(TEEPROM), pcBuffer, ui16Length);
+    eeprom.readBlock(sizeof(TEEPROM), (uint8_t*)pvBuffer, ui16Length);
     return true;
 }
 } // namespace nspMiniCtrlBox
