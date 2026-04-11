@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 namespace nspMiniCtrlBox {
-#define MINICTRLBOX_SW_VERSION "5.0.10"
+#define MINICTRLBOX_SW_VERSION "5.0.11"
 #define MINICTRLBOX_HW_VERSION "3.0.1"
 
 bool gloIsI2CDevicePresent(uint8_t ui8DeviceAddress);
