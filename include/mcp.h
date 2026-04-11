@@ -1,6 +1,7 @@
 #pragma once
 #include <MCP23017.h>
 
+namespace nspMiniCtrlBox {
 #define MCP_LOCAL_ADDRESS 0x20  // Address for the MCP23017 on the Mainboard
 #define MCP_SLB_ADDRESS 0x21    // Address for the MCP23017 on the SwitchLEDBoard
 
@@ -88,3 +89,4 @@ inline CPortExpLoc::RGBLEDColor operator|(CPortExpLoc::RGBLEDColor a, CPortExpLo
 inline CPortExpRem::LEDColor operator|(CPortExpRem::LEDColor a, CPortExpRem::LEDColor b) {
     return static_cast<CPortExpRem::LEDColor>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
+} // namespace nspMiniCtrlBox

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <can.h>
 
+namespace nspMiniCtrlBox {
 CCanBus::CCanBus(gpio_num_t txPin, gpio_num_t rxPin, uint32_t bitrate)
     : txPin(txPin), rxPin(rxPin), bitrate(bitrate), running(false)
 {
@@ -102,4 +103,4 @@ twai_timing_config_t CCanBus::timingFromBitrate(uint32_t bitrate) {
 void CCanBus::setCANTermination(bool boTermination) {
     digitalWrite(PIN_SSR, boTermination);
 }
-
+} // namespace nspMiniCtrlBox

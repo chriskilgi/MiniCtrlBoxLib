@@ -1,5 +1,6 @@
 #include <eep.h>
 
+namespace nspMiniCtrlBox {
 CEeprom::CEeprom(uint8_t deviceAddress) : eeprom(deviceAddress, I2C_DEVICESIZE_24LC02)
 {
 
@@ -66,3 +67,4 @@ bool CEeprom::readUserData(uint8_t * buffer, uint16_t length) {
     eeprom.readBlock(sizeof(TEEPROM), buffer, length);
     return true;
 }
+} // namespace nspMiniCtrlBox

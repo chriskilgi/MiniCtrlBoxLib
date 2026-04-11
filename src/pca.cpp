@@ -1,6 +1,7 @@
 #include <glo.h>
 #include <pca.h>
 
+namespace nspMiniCtrlBox {
 CServo::CServo() {
     pPwmDriver = nullptr; // Initialize the PWM driver pointer to nullptr
 }
@@ -150,3 +151,4 @@ float CServo::getServoSensorAnalog(SensorPin ui8SensorPin) {
             return 0.0; // Return 0 for invalid sensor pin
     }
 }
+} // namespace nspMiniCtrlBox

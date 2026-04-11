@@ -1,5 +1,6 @@
 #include <tim.h>
 
+namespace nspMiniCtrlBox {
 // Table of instances to allow static ISR wrappers to call the correct instance's onTimer() method
 CTimer* CTimer::instances[4] = { nullptr, nullptr, nullptr, nullptr };
 
@@ -55,6 +56,7 @@ void IRAM_ATTR CTimer::isr3() {
     if (instances[3] && instances[3]->pTimerCallbackFunction) 
         instances[3]->pTimerCallbackFunction(); 
 }
+} // namespace nspMiniCtrlBox
 
 
 

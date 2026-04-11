@@ -1,9 +1,16 @@
 #include <asbSensors.h>
 
+namespace nspMiniCtrlBox {
+// Alias for the magnetic sensor data struct, to avoid having to write CASBSensors::TMLX90393Data everywhere
+using TMLX90393Data = CASBSensors::TMLX90393Data;
+
 CASBSensors::CASBSensors() {
     // Initialize the AHT20 sensor pointer to nullptr
     // (indicating that the sensor is not initiaLlized or not present)
     pAHT20 = nullptr; 
+
+    // Initialize the MLX90393 sensor pointer to nullptr
+    // (indicating that the sensor is not initiaLlized or not present)
     pMLX90393 = nullptr;
 }
 
@@ -55,8 +62,8 @@ bool CASBSensors::initMLX90393() {
     return boSensorFound;
 }
 
-CASBSensors::TMLX90393Data CASBSensors::getMLX90393Data() {
-    CASBSensors::TMLX90393Data tMagneticData = {0.0f, 0.0f, 0.0f}; // Default values if the sensor is not installed
+TMLX90393Data CASBSensors::getMLX90393Data() {
+    TMLX90393Data tMagneticData = {0.0f, 0.0f, 0.0f}; // Default values if the sensor is not installed
 
     if (!pMLX90393) {
         return tMagneticData; // Return default values if the sensor is not installed
@@ -85,3 +92,5 @@ float CASBSensors::getVoltagePercent() {
     uint16_t rawValue = getVoltageDigital(); // Get the raw ADC value (0-4095)
     return (rawValue * 100.0) / 4095.0; // Convert the raw value to a percentage
 }
+
+} // namespace nspMiniCtrlBox

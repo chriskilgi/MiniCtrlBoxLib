@@ -1,5 +1,6 @@
 #include <btn.h>
 
+namespace nspMiniCtrlBox {
 CButton::CButton(gpio_num_t interruptPin, uint32_t ui32DebounceMs)
     : pin(interruptPin), debounceTimeUs(ui32DebounceMs * 1000)
 {
@@ -55,3 +56,4 @@ void CButton::updateFlags() {
         isrTriggered = false; // reset the ISR trigger flag
     }
 }
+} // namespace nspMiniCtrlBox

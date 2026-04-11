@@ -1,5 +1,6 @@
 #include <dsp.h>
 
+namespace nspMiniCtrlBox {
 COLed::COLed(TwoWire& wire, int8_t rst) 
     : display(WIDTH, HEIGHT, &wire, rst), textSize(1) {
 }
@@ -99,3 +100,4 @@ void COLed::printfLine(uint8_t row, const char* fmt, uint8_t size, ...) {
 
     printLine(row, buffer, size);
 }
+} // namespace nspMiniCtrlBox

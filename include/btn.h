@@ -5,37 +5,39 @@
 #define PIN_BUTTON_1 GPIO_NUM_10
 #define PIN_BUTTON_2 GPIO_NUM_3
 
-class CButton {
-public:
-    CButton(gpio_num_t interruptPin, uint32_t ui32DebounceMs= 30);
+namespace nspMiniCtrlBox {
+    class CButton {
+    public:
+        CButton(gpio_num_t interruptPin, uint32_t ui32DebounceMs= 30);
 
-    ~CButton(); 
+        ~CButton(); 
 
-    bool hasButtonPressed() const;
-    bool hasButtonReleased() const;
-    void resetPressedFlag();
-    void resetReleasedFlag();
+        bool hasButtonPressed() const;
+        bool hasButtonReleased() const;
+        void resetPressedFlag();
+        void resetReleasedFlag();
 
 
-    // Has to be called in the main loop to update the button state and set the flag
-    // when a stable button press or releaseis detected
-    void updateFlags();
+        // Has to be called in the main loop to update the button state and set the flag
+        // when a stable button press or releaseis detected
+        void updateFlags();
 
-private:
-    gpio_num_t pin;
-    volatile bool boPressedFlag;
-    volatile bool boReleasedFlag;
+    private:
+        gpio_num_t pin;
+        volatile bool boPressedFlag;
+        volatile bool boReleasedFlag;
 
-    uint64_t debounceTimeUs;
-    uint64_t lastChangeUs;
+        uint64_t debounceTimeUs;
+        uint64_t lastChangeUs;
 
-    volatile bool isrTriggered;
-    bool stableState;
+        volatile bool isrTriggered;
+        bool stableState;
 
-    static void IRAM_ATTR isrHandler(void* arg) {
-        CButton* self = static_cast<CButton*>(arg);
+        static void IRAM_ATTR isrHandler(void* arg) {
+            CButton* self = static_cast<CButton*>(arg);
 
-        self->lastChangeUs = esp_timer_get_time();
-        self->isrTriggered = true;
-    }
-};
+            self->lastChangeUs = esp_timer_get_time();
+            self->isrTriggered = true;
+        }
+    };
+} // namespace nspMiniCtrlBox

@@ -1,6 +1,7 @@
 #include <glo.h>
 #include <mcp.h>
 
+namespace nspMiniCtrlBox {
 // The CMCP class provides a base class for controlling MCP23017 I/O expanders,
 // which are used to control the RGB LEDs and the switch LEDs in the MiniCtrlBox project. 
 // It initializes the MCP23017 and provides a common interface for derived
@@ -149,3 +150,4 @@ bool CPortExpRem::getSwitchState(uint8_t ui8SwitchNo) {
     }
     return false;
 }
+} // namespace nspMiniCtrlBox
