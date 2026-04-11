@@ -27,11 +27,11 @@ bool COLed::isPresent() {
 }
 
 // Set the text size (1 = small, 2 = large)
-void COLed::setTextSize(uint8_t size) {
-    if (size < 1) size = 1;
-    if (size > 3) size = 3;   // optional: limit to 3
+void COLed::setTextSize(uint8_t ui8Size) {
+    if (ui8Size < 1) ui8Size = 1;
+    if (ui8Size > 3) ui8Size = 3;   // optional: limit to 3
 
-    textSize = size;
+    textSize = ui8Size;
     display.setTextSize(textSize);
 
     // Update character dimensions
@@ -42,32 +42,30 @@ void COLed::setTextSize(uint8_t size) {
     cols = WIDTH / charW;
 }
 
-void COLed::clearLine(uint8_t row) {
-    if (row >= rows) return;
+void COLed::clearLine(uint8_t ui8Row) {
+    if (ui8Row >= rows) return;
 
     display.fillRect(
         0,
-        row * charH,
+        ui8Row * charH,
         WIDTH,
         charH,
         SSD1306_BLACK
     );
 }
 
-void COLed::printAt(uint8_t row, uint8_t col, const char* text, uint8_t size) {
-    if (size != 0) setTextSize(size);
+void COLed::printAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcText) {
+    if (ui8Row >= rows || ui8Col >= cols) return;
 
-    if (row >= rows || col >= cols) return;
+    clearLine(ui8Row);
 
-    clearLine(row);
-
-    display.setCursor(col * charW, row * charH);
-    display.print(text);
+    display.setCursor(ui8Col * charW, ui8Row * charH);
+    display.print(pcText);
     display.display();
 }
 
-void COLed::printLine(uint8_t row, const char* text, uint8_t size) {
-    printAt(row, 0, text, size);
+void COLed::printLine(uint8_t ui8Row, const char* pcText) {
+    printAt(ui8Row, 0, pcText);
 }
 
 void COLed::clear() {
@@ -75,29 +73,29 @@ void COLed::clear() {
     display.display();
 }
 
-void COLed::printfAt(uint8_t row, uint8_t col, const char* fmt, uint8_t size, ...) {
-    if (row >= rows || col >= cols) return;
+void COLed::printfAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcFormattedText, ...) {
+    if (ui8Row >= rows || ui8Col >= cols) return;
 
     char buffer[64];
 
     va_list args;
-    va_start(args, size);
-    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_start(args, pcFormattedText);
+    vsnprintf(buffer, sizeof(buffer), pcFormattedText, args);
     va_end(args);
 
-    printAt(row, col, buffer, size);
+    printAt(ui8Row, ui8Col, buffer);
 }
 
-void COLed::printfLine(uint8_t row, const char* fmt, uint8_t size, ...) {
-    if (row >= rows) return;
+void COLed::printfLine(uint8_t ui8Row, const char* pcFormattedText, ...) {
+    if (ui8Row >= rows) return;
 
     char buffer[64];
 
     va_list args;
-    va_start(args, size);
-    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_start(args, pcFormattedText);
+    vsnprintf(buffer, sizeof(buffer), pcFormattedText, args);
     va_end(args);
 
-    printLine(row, buffer, size);
+    printLine(ui8Row, buffer);
 }
 } // namespace nspMiniCtrlBox

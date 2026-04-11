@@ -41,7 +41,7 @@ namespace nspMiniCtrlBox {
         void setPWMPercent(PWMChannel channel, uint8_t ui8Percent, bool boInvert = false);
         void setPWMFreq(float fFreq);
         void setMicroseconds(PWMChannel channel, uint16_t ui16Microseconds);
-        uint16_t angleToMicroseconds(float angle);
+        uint16_t angleToMicroseconds(float fAngle);
         void setMinMaxServoMicroseconds(uint16_t ui16Min, uint16_t ui16Max) { ui16ServoTimeMin = ui16Min; ui16ServoTimeMax = ui16Max; } // Setter for minimum and maximum pulse widths for the servo
 
         void allChannelsOff();

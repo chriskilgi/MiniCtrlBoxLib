@@ -27,44 +27,44 @@ void CEeprom::readDeviceInfo(TEEPROM* pDeviceInfo) {
     boDeviceInfoLoaded = true;
 }
 
-void CEeprom::setHWVersion(const char* version) {
+void CEeprom::setHWVersion(const char* pcVersion) {
     if (!boDeviceInfoLoaded) {
         // If device info is not loaded, we should read it first
         readDeviceInfo(&tDeviceInfo);
     }
-    strncpy(tDeviceInfo.acHWVersion, version, sizeof(tDeviceInfo.acHWVersion) - 1);
+    strncpy(tDeviceInfo.acHWVersion, pcVersion, sizeof(tDeviceInfo.acHWVersion) - 1);
     tDeviceInfo.acHWVersion[sizeof(tDeviceInfo.acHWVersion) - 1] = '\0'; // Ensure null-termination
     writeDeviceInfo(&tDeviceInfo); // Write the updated device info back to EEPROM
 }
 
 
-void CEeprom::setSWVersion(const char* version) {
+void CEeprom::setSWVersion(const char* pcVersion) {
     if (!boDeviceInfoLoaded) {
         // If device info is not loaded, we should read it first
         readDeviceInfo(&tDeviceInfo);
     }
-    strncpy(tDeviceInfo.acSWVersion, version, sizeof(tDeviceInfo.acSWVersion) - 1);
+    strncpy(tDeviceInfo.acSWVersion, pcVersion, sizeof(tDeviceInfo.acSWVersion) - 1);
     tDeviceInfo.acSWVersion[sizeof(tDeviceInfo.acSWVersion) - 1] = '\0'; // Ensure null-termination
     writeDeviceInfo(&tDeviceInfo); // Write the updated device info back to EEPROM
 }
 
-bool CEeprom::writeUserData(const uint8_t * buffer, uint16_t length) {
+bool CEeprom::writeUserData(const uint8_t * pcBuffer, uint16_t ui16Length) {
     // Write user data starting from address sizeof(TEEPROM) to avoid overwriting device info
-    if (length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
+    if (ui16Length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
         // Handle error: not enough space to write user data
         return false;
     }
-    eeprom.writeBlock(sizeof(TEEPROM), buffer, length);
+    eeprom.writeBlock(sizeof(TEEPROM), pcBuffer, ui16Length);
     return true;
 }
 
-bool CEeprom::readUserData(uint8_t * buffer, uint16_t length) {
+bool CEeprom::readUserData(uint8_t * pcBuffer, uint16_t ui16Length) {
     // Read user data starting from address sizeof(TEEPROM) to avoid reading device info
-    if (length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
+    if (ui16Length + sizeof(TEEPROM) > I2C_DEVICESIZE_24LC02) {
         // Handle error: not enough space to read user data
         return false;
     }
-    eeprom.readBlock(sizeof(TEEPROM), buffer, length);
+    eeprom.readBlock(sizeof(TEEPROM), pcBuffer, ui16Length);
     return true;
 }
 } // namespace nspMiniCtrlBox

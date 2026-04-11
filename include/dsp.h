@@ -11,18 +11,15 @@ namespace nspMiniCtrlBox {
         bool isPresent();
 
         void clear();
-        void clearLine(uint8_t row);
+        void clearLine(uint8_t ui8Row);
 
-        // Optionaler Parameter size:
-        // 0 = aktuelle Größe
-        // 1 = klein, 2 = groß
-        void printAt(uint8_t row, uint8_t col, const char* text, uint8_t size = 0);
-        void printLine(uint8_t row, const char* text, uint8_t size = 0);
+        void printAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcText);
+        void printLine(uint8_t ui8Row, const char* pcText);
 
-        void printfAt(uint8_t row, uint8_t col, const char* fmt, uint8_t size, ...);
-        void printfLine(uint8_t row, const char* fmt, uint8_t size, ...);
+        void printfAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcFormattedText, ...);
+        void printfLine(uint8_t ui8Row, const char* pcFormattedText, ...);
 
-        void setTextSize(uint8_t size);
+        void setTextSize(uint8_t ui8Size);
 
     private:
         Adafruit_SSD1306 display;

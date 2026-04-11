@@ -79,6 +79,10 @@ void CServo::setPWMFreq(float fFreq) {
     pPwmDriver->setPWMFreq(fFreq);
 }
 
+// Method to set the pulse width in microseconds for a specific channel
+// This is particularly useful for controlling servos, where the pulse width directly corresponds to the servo position
+// The PCA9685 can generate pulse widths from approximately 500 microseconds (0.5 ms) to 2500 microseconds (2.5 ms),
+// which typically corresponds to the full range of motion for standard servos (0° to 180°)
 void CServo::setMicroseconds(PWMChannel channel, uint16_t ui16Microseconds) {
     if (pPwmDriver == nullptr) {
         return;
@@ -86,15 +90,19 @@ void CServo::setMicroseconds(PWMChannel channel, uint16_t ui16Microseconds) {
     pPwmDriver->writeMicroseconds(channel, ui16Microseconds);
 }
 
-uint16_t CServo::angleToMicroseconds(float angle) {
+// Method to convert an angle in degrees (0-180°) to a pulse width in microseconds based on the minimum and maximum pulse widths defined for the servo
+// This method allows for easy control of servo position by specifying the desired angle, and it will calculate the corresponding pulse width to send to the servo
+// The default minimum and maximum pulse widths are set to 500 and 2500 microseconds, respectively, which are common values for standard servos,
+// but they can be adjusted using the setMinMaxServoMicroseconds method if your specific servo
+uint16_t CServo::angleToMicroseconds(float fAngle) {
   // Begrenzen auf 0–180°
-  if (angle < 0) angle = 0;
-  if (angle > 180) angle = 180;
+  if (fAngle < 0) fAngle = 0;
+  if (fAngle > 180) fAngle = 180;
 
   // Calculate the pulse width in microseconds based on the angle, using a linear mapping between the minimum and maximum pulse widths defined for the servo
   // Normally, the values 500 and 2500 are used for standard servos, but they can be adjusted if your specific servo has different timing requirements
   // The values can be adjusted using the setMinMaxServoMicroseconds method to ensure compatibility with different servo models
-  return ui16ServoTimeMin + (angle / 180.0f) * (ui16ServoTimeMax - ui16ServoTimeMin);
+  return ui16ServoTimeMin + (fAngle / 180.0f) * (ui16ServoTimeMax - ui16ServoTimeMin);
 }
 
 // Method to enable or disable the output of the PCA9685 by controlling the OE pin
