@@ -1,6 +1,6 @@
 {
   "name": "MiniCtrlBoxLib",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "High-level hardware abstraction library for the MiniCtrlBox (OLED, EEPROM, MCP23017, Buttons, CAN, etc.)",
   "keywords": [
     "oled",
@@ -42,6 +42,6 @@
     { "name": "robtillaart/I2C_EEPROM", "version": "^1.9.4" },
     { "name": "adafruit/Adafruit PWM Servo Driver Library", "version": "^3.0.3" },
     { "name": "adafruit/Adafruit AHTX0", "version": "^2.0.6" },
-    { "name": "adafruit/Adafruit MLX90393", "version": "^2.0.5" }
+    { "name": "7semi-solutions/7Semi MLX90393", "version": "^1.0.0" }
  ]
 }
