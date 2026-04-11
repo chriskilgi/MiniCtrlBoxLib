@@ -1,6 +1,6 @@
 {
   "name": "MiniCtrlBoxLib",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "description": "High-level hardware abstraction library for the MiniCtrlBox (OLED, EEPROM, MCP23017, Buttons, CAN, etc.)",
   "keywords": [
     "oled",
@@ -30,10 +30,6 @@
   "license": "MIT",
   "frameworks": "arduino",
   "platforms": "espressif32",
-  "build": {
-    "includeDir": "include",
-    "srcDir": "src"
-  },
   "dependencies": [
     { "name": "adafruit/Adafruit GFX Library", "version": "^1.12.5" },
     { "name": "adafruit/Adafruit BusIO", "version": "^1.17.4" },
