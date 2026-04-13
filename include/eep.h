@@ -62,6 +62,7 @@ namespace nspMiniCtrlBox {
             // Calculate free space based on the size of TEEPROM and total EEPROM size
             return I2C_DEVICESIZE_24LC02 - sizeof(TEEPROM);
         }
+        void setID(uint8_t ui8ID);
         void setHWVersion(const char* pcVersion);
         void setSWVersion(const char* pcVersion);
 

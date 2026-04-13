@@ -27,6 +27,15 @@ void CEeprom::readDeviceInfo(TEEPROM* pDeviceInfo) {
     boDeviceInfoLoaded = true;
 }
 
+void CEeprom::setID(uint8_t ui8ID) {
+    if (!boDeviceInfoLoaded) {
+        // If device info is not loaded, we should read it first
+        readDeviceInfo(&tDeviceInfo);
+    }
+    tDeviceInfo.ui8ID = ui8ID;
+    writeDeviceInfo(&tDeviceInfo); // Write the updated device info back to EEPROM
+}
+
 void CEeprom::setHWVersion(const char* pcVersion) {
     if (!boDeviceInfoLoaded) {
         // If device info is not loaded, we should read it first
