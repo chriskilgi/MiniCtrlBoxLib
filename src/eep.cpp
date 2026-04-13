@@ -27,13 +27,19 @@ void CEeprom::readDeviceInfo(TEEPROM* pDeviceInfo) {
     boDeviceInfoLoaded = true;
 }
 
-void CEeprom::setID(uint8_t ui8ID) {
-    if (!boDeviceInfoLoaded) {
-        // If device info is not loaded, we should read it first
-        readDeviceInfo(&tDeviceInfo);
+void CEeprom::writeID(uint8_t ui8ID) {
+    if (isPresent()) {
+        eeprom.writeBlock(offsetof(TEEPROM, ui8ID), (const uint8_t*)&ui8ID, sizeof(TEEPROM::ui8ID)); // Write only the ID field to EEPROM
     }
-    tDeviceInfo.ui8ID = ui8ID;
-    writeDeviceInfo(&tDeviceInfo); // Write the updated device info back to EEPROM
+}
+
+uint8_t CEeprom::readID() {
+    uint8_t ui8ID;
+    if (isPresent()) {
+        // Read only the ID field from EEPROM
+        eeprom.readBlock(offsetof(TEEPROM, ui8ID), (uint8_t*)&ui8ID, sizeof(TEEPROM::ui8ID)); 
+    }
+    return ui8ID;
 }
 
 void CEeprom::setHWVersion(const char* pcVersion) {

@@ -26,7 +26,7 @@ namespace nspMiniCtrlBox {
         void writeDeviceInfo(const TEEPROM* pDeviceInfo);
         void readDeviceInfo(TEEPROM* pDeviceInfo);
 
-        uint8_t getID() const { return tDeviceInfo.ui8ID; }
+        uint8_t readID();
 
         const char* getProjectName()  {
             if (!boDeviceInfoLoaded) {
@@ -62,7 +62,7 @@ namespace nspMiniCtrlBox {
             // Calculate free space based on the size of TEEPROM and total EEPROM size
             return I2C_DEVICESIZE_24LC02 - sizeof(TEEPROM);
         }
-        void setID(uint8_t ui8ID);
+        void writeID(uint8_t ui8ID);
         void setHWVersion(const char* pcVersion);
         void setSWVersion(const char* pcVersion);
 
