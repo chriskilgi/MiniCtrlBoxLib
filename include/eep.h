@@ -7,8 +7,8 @@
 namespace nspMiniCtrlBox {
     struct TEEPROM {   
     uint8_t ui8ID;                    // z.B. 1
-    char acProjektbezeichnung[20];    // z.B. "MiniCtrlBox"
-    char acBoardbezeichnung[20];      // z.B. "Mainboard"
+    char acProjectname[20];           // z.B. "MiniCtrlBox"
+    char acBoardname[20];             // z.B. "Mainboard"
     char acSWVersion[10];             // z.B. "1.0.0"
     char acHWVersion[10];             // z.B. "3.0.1"
     };
@@ -20,51 +20,26 @@ namespace nspMiniCtrlBox {
             Wire.begin(); // Initialize I2C communication
             return eeprom.begin();
         }
-        bool isPresent();
+        bool isPresent(uint8_t ui8DeviceAddress = EEPROM_ADRESS);
         uint8_t getAddress();
 
         void writeDeviceInfo(const TEEPROM* pDeviceInfo);
         void readDeviceInfo(TEEPROM* pDeviceInfo);
-
-        uint8_t readID();
-
-        const char* getProjectName()  {
-            if (!boDeviceInfoLoaded) {
-                // If device info is not loaded, we should read it first
-                readDeviceInfo(&tDeviceInfo);
-            }
-            return tDeviceInfo.acProjektbezeichnung;
-        }
-        const char* getBoardName() {
-            if (!boDeviceInfoLoaded) {
-                // If device info is not loaded, we should read it first
-                readDeviceInfo(&tDeviceInfo);
-            }
-            return tDeviceInfo.acBoardbezeichnung;
-        }
-        const char* getHWVersion() {
-            if (!boDeviceInfoLoaded) {
-                // If device info is not loaded, we should read it first
-                readDeviceInfo(&tDeviceInfo);
-            }
-            return tDeviceInfo.acHWVersion;
-        }
-
-        const char* getSWVersion() {
-            if (!boDeviceInfoLoaded) {
-                // If device info is not loaded, we should read it first
-                readDeviceInfo(&tDeviceInfo);
-            }
-            return tDeviceInfo.acSWVersion;
-        }
 
         uint8_t getFreeSpace() {
             // Calculate free space based on the size of TEEPROM and total EEPROM size
             return I2C_DEVICESIZE_24LC02 - sizeof(TEEPROM);
         }
         void writeID(uint8_t ui8ID);
-        void setHWVersion(const char* pcVersion);
-        void setSWVersion(const char* pcVersion);
+        void writeProjectName(const char* pcName);
+        void writeBoardName(const char* pcName);
+        void writeHWVersion(const char* pcVersion);
+        void writeSWVersion(const char* pcVersion);
+        uint8_t readID();
+        const char* readHWVersion();
+        const char* readSWVersion();
+        const char* readProjectName();
+        const char* readBoardName();
 
         bool writeUserData(const void* pvBuffer, uint16_t ui16Length);
         bool readUserData(const void* pvBuffer, uint16_t ui16Length);
