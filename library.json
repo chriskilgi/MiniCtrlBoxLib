@@ -38,6 +38,7 @@
     { "name": "robtillaart/I2C_EEPROM", "version": "^1.9.4" },
     { "name": "adafruit/Adafruit PWM Servo Driver Library", "version": "^3.0.3" },
     { "name": "adafruit/Adafruit AHTX0", "version": "^2.0.6" },
-    { "name": "7semi-solutions/7Semi MLX90393", "version": "^1.0.0" }
+    { "name": "7semi-solutions/7Semi MLX90393", "version": "^1.0.0" },
+    { "name": "sensirion/Sensirion I2C SCD4x", "version": "^1.1.0" }
  ]
 }

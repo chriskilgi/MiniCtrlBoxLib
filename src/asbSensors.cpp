@@ -1,39 +1,36 @@
 #include <asbSensors.h>
 
 namespace nspMiniCtrlBox {
-// Alias for the magnetic sensor data struct, to avoid having to write CASBSensors::TMLX90393Data everywhere
+
+// Alias for the magnetic sensor data struct
 using TMLX90393Data = CASBSensors::TMLX90393Data;
 
+// -------------------------------------------------------------
+// Constructor
+// -------------------------------------------------------------
 CASBSensors::CASBSensors() {
-    // Initialize the AHT20 sensor pointer to nullptr
-    // (indicating that the sensor is not initiaLlized or not present)
-    pAHT20 = nullptr; 
-
-    // Initialize the MLX90393 sensor pointer to nullptr
-    // (indicating that the sensor is not initiaLlized or not present)
+    pAHT20 = nullptr;
     pMLX90393 = nullptr;
+    pSCD41 = nullptr;
 }
 
-
-// Return the temperature value from the AHT20 sensor, or -273.15 if the sensor is not installed
+// -------------------------------------------------------------
+// AHT20
+// -------------------------------------------------------------
 float CASBSensors::getAHT20Temperature() {
     if (!pAHT20) {
-        return -273.15f; // Return a very low temperature if the sensor is not installed :-)
+        return -273.15f;
     }
     return pAHT20->getTemperature();
 }
 
-// Return the humidity value from the AHT20 sensor, or -1 if the sensor is not installed
 float CASBSensors::getAHT20Humidity() {
     if (!pAHT20) {
-        return -100.0f; // Return an impossible value if the sensor is not installed
+        return -100.0f;
     }
     return pAHT20->getHumidity();
 }
 
-// Try to initialize the AHT20 sensor and return true if successful, false otherwise
-// This is important, because if the sensor ist not plugged in, we don't want to try
-// to read data from it, which would cause errors
 bool CASBSensors::initAHT20() {
     bool boSensorFound = false;
 
@@ -48,6 +45,9 @@ bool CASBSensors::initAHT20() {
     return boSensorFound;
 }
 
+// -------------------------------------------------------------
+// MLX90393
+// -------------------------------------------------------------
 bool CASBSensors::initMLX90393() {
     bool boSensorFound = false;
 
@@ -63,34 +63,113 @@ bool CASBSensors::initMLX90393() {
 }
 
 TMLX90393Data CASBSensors::getMLX90393Data() {
-    TMLX90393Data tMagneticData = {0.0f, 0.0f, 0.0f}; // Default values if the sensor is not installed
+    TMLX90393Data tMagneticData = {0.0f, 0.0f, 0.0f};
 
     if (!pMLX90393) {
-        return tMagneticData; // Return default values if the sensor is not installed
-    } else {
-        // Read the magnetic field data from the MLX90393 sensor and store it in the data struct
-        pMLX90393->readMag(tMagneticData.x, tMagneticData.y, tMagneticData.z);
+        return tMagneticData;
     }
+
+    pMLX90393->readMag(tMagneticData.x, tMagneticData.y, tMagneticData.z);
     return tMagneticData;
 }
 
-// Read the voltage from the potentiometer connected to GPIO 5 and return it
-// as a 16-bit value (0-4095 for a 12-bit ADC)
+// -------------------------------------------------------------
+// Analog Input
+// -------------------------------------------------------------
 uint16_t CASBSensors::getVoltageDigital() {
-    return analogRead(PIN_ASB_SENSORS_ANALOG); 
+    return analogRead(PIN_ASB_SENSORS_ANALOG);
 }
 
-// Read the voltage from the potentiometer and return it as a float value in volts
-// Assuming a reference voltage of 3.3V and a 12-bit ADC, the raw ADC value (0-4095) is converted to a voltage by multiplying it by the reference voltage and dividing by the maximum ADC value
 float CASBSensors::getVoltageAnalog() {
-    uint16_t rawValue = getVoltageDigital(); // Get the raw ADC value
-    return (rawValue * fRefVoltage) / 4095; // Convert the raw value to a voltage (0-3.3V)
+    uint16_t rawValue = getVoltageDigital();
+    return (rawValue * fRefVoltage) / 4095.0f;
 }
 
-// Read the voltage from the potentiometer and return it as a percentage (0-100%)
 float CASBSensors::getVoltagePercent() {
-    uint16_t rawValue = getVoltageDigital(); // Get the raw ADC value (0-4095)
-    return (rawValue * 100.0) / 4095.0; // Convert the raw value to a percentage
+    uint16_t rawValue = getVoltageDigital();
+    return (rawValue * 100.0f) / 4095.0f;
+}
+
+// -------------------------------------------------------------
+// SCD41 (CO₂ / Temp / Humidity)
+// -------------------------------------------------------------
+bool CASBSensors::initSCD41() {
+    bool boSensorFound = false;
+
+    pSCD41 = new SensirionI2CScd4x();
+    pSCD41->begin(Wire);
+
+    uint16_t error;
+    char errorMessage[256];
+
+    // Stop any previous measurement
+    error = pSCD41->stopPeriodicMeasurement();
+    delay(500);
+
+    // Start periodic measurement
+    error = pSCD41->startPeriodicMeasurement();
+    if (error) {
+        SensirionI2CScd4x::errorToString(error, errorMessage, sizeof(errorMessage));
+
+        // Fehlertext in char-array kopieren
+        strncpy(sSCD41LastError, errorMessage, sizeof(sSCD41LastError) - 1);
+        sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
+
+        delete pSCD41;
+        pSCD41 = nullptr;
+        bSCD41Initialized = false;
+        return false;
+    }
+
+    bSCD41Initialized = true;
+    return true;
+}
+
+CASBSensors::TSCD41Data CASBSensors::getSCD41Data() {
+    TSCD41Data data{};
+    data.valid = false;
+
+    if (!pSCD41 || !bSCD41Initialized) {
+        strncpy(sSCD41LastError, "SCD41 not initialized", sizeof(sSCD41LastError) - 1);
+        sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
+        return data;
+    }
+
+    uint16_t co2;
+    float temp;
+    float hum;
+    uint16_t error;
+    char errorMessage[256];
+
+    error = pSCD41->readMeasurement(co2, temp, hum);
+    if (error) {
+        SensirionI2CScd4x::errorToString(error, errorMessage, sizeof(errorMessage));
+
+        strncpy(sSCD41LastError, errorMessage, sizeof(sSCD41LastError) - 1);
+        sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
+
+        return data;
+    }
+
+    if (co2 == 0) {
+        strncpy(sSCD41LastError, "Invalid sample", sizeof(sSCD41LastError) - 1);
+        sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
+        return data;
+    }
+
+    data.co2ppm = co2;
+    data.temperature = temp;
+    data.humidity = hum;
+    data.valid = true;
+
+    // Fehlertext löschen
+    sSCD41LastError[0] = '\0';
+
+    return data;
+}
+
+const char* CASBSensors::getSCD41LastError() const {
+    return sSCD41LastError;
 }
 
 } // namespace nspMiniCtrlBox
