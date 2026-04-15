@@ -3,6 +3,7 @@
 namespace nspMiniCtrlBox {
 // Alias for the magnetic sensor data struct, to avoid having to write CASBSensors::TMLX90393Data everywhere
 using TMLX90393Data = CASBSensors::TMLX90393Data;
+using TSCD4xData = CASBSensors::TSCD4xData;
 
 CASBSensors::CASBSensors() {
     // Initialize the AHT20 sensor pointer to nullptr
@@ -12,8 +13,14 @@ CASBSensors::CASBSensors() {
     // Initialize the MLX90393 sensor pointer to nullptr
     // (indicating that the sensor is not initiaLlized or not present)
     pMLX90393 = nullptr;
+
+    // Initialize the SCD4x sensor pointer to nullptr
+    pSCD4x = nullptr;
 }
 
+// ----------------
+// Temperature and Humidity Sensor AHT20
+// ----------------
 
 // Return the temperature value from the AHT20 sensor, or -273.15 if the sensor is not installed
 float CASBSensors::getAHT20Temperature() {
@@ -48,6 +55,10 @@ bool CASBSensors::initAHT20() {
     return boSensorFound;
 }
 
+// ----------------
+// Magnetic-Sensor MLX90393
+// ----------------
+
 bool CASBSensors::initMLX90393() {
     bool boSensorFound = false;
 
@@ -73,6 +84,47 @@ TMLX90393Data CASBSensors::getMLX90393Data() {
     }
     return tMagneticData;
 }
+
+// ----------------
+// CO2-Sensor SCD4x
+// ----------------
+bool CASBSensors::initSCD4x() {
+    bool boSensorFound = false;
+
+    pSCD4x = new SCD4x();
+    if (pSCD4x->begin()) {
+        boSensorFound = true;
+        pSCD4x->startPeriodicMeasurement();
+    } else {
+        delete pSCD4x;
+        pSCD4x = nullptr;
+    }
+
+    return boSensorFound;
+}
+
+TSCD4xData CASBSensors::getSCD4xData() {
+    TSCD4xData tSCD4xData = {0, -273.15f, 0.0f}; // Default values if the sensor is not installed
+
+    if (!pSCD4x) {
+        return tSCD4xData; // Return default values if the sensor is not installed
+    }
+
+    while (!pSCD4x->readMeasurement()) {
+        ;
+    }   
+
+    tSCD4xData.ui16CO2 = pSCD4x->getCO2();
+    tSCD4xData.fTemperature = pSCD4x->getTemperature();
+    tSCD4xData.fHumidity = pSCD4x->getHumidity();
+
+    return tSCD4xData;
+}
+
+
+// ----------------
+// Analog Sensors (i.e. Potentiometer at GPIO0)
+// ----------------
 
 // Read the voltage from the potentiometer connected to GPIO 5 and return it
 // as a 16-bit value (0-4095 for a 12-bit ADC)

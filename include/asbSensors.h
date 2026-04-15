@@ -6,6 +6,7 @@
 
 #include <AHT20.h>
 #include <7Semi_MLX90393.h>
+#include "SparkFun_SCD4x_Arduino_Library.h"
 
 
 
@@ -22,6 +23,12 @@ namespace nspMiniCtrlBox {
                 float z;
             };
 
+        struct TSCD4xData {
+            uint16_t ui16CO2;
+            float fTemperature;
+            float fHumidity;
+        };
+
         CASBSensors();
 
         // Methods for the Humitity / Temperature AHT20 sensor
@@ -33,6 +40,10 @@ namespace nspMiniCtrlBox {
         bool initMLX90393();
         TMLX90393Data getMLX90393Data();
 
+        // Methods for the SCD4x CO2 sensor
+        bool initSCD4x();
+        TSCD4xData getSCD4xData();
+
         // Methods for the analog Port GPIO0 (e.g. for a potentiometer)
         float getVoltageAnalog();
         float getVoltagePercent();
@@ -43,6 +54,7 @@ namespace nspMiniCtrlBox {
     private:
         AHT20 *pAHT20; // Pointer to the AHT20 sensor object, or nullptr if the sensor is not installed
         MLX90393_7Semi *pMLX90393; // Pointer to the MLX90393 sensor object, or nullptr if the sensor is not installed
+        SCD4x *pSCD4x; // Pointer to the SCD4x sensor object, or nullptr if the sensor is not installed
         float fRefVoltage = 3.3f; // Default reference voltage for the potentiometer readings
     };
 } // namespace nspMiniCtrlBox
