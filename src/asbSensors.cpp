@@ -96,8 +96,8 @@ float CASBSensors::getVoltagePercent() {
 bool CASBSensors::initSCD41() {
     bool boSensorFound = false;
 
-    pSCD41 = new SensirionI2CScd4x();
-    pSCD41->begin(Wire);
+    pSCD41 = new SensirionI2cScd4x();
+    pSCD41->begin(Wire, 0x62);
 
     uint16_t error;
     char errorMessage[256];
@@ -109,11 +109,9 @@ bool CASBSensors::initSCD41() {
     // Start periodic measurement
     error = pSCD41->startPeriodicMeasurement();
     if (error) {
-        SensirionI2CScd4x::errorToString(error, errorMessage, sizeof(errorMessage));
-
         // Fehlertext in char-array kopieren
-        strncpy(sSCD41LastError, errorMessage, sizeof(sSCD41LastError) - 1);
-        sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
+        //strncpy(sSCD41LastError, errorMessage, sizeof(sSCD41LastError) - 1);
+        //sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
 
         delete pSCD41;
         pSCD41 = nullptr;
@@ -143,10 +141,10 @@ CASBSensors::TSCD41Data CASBSensors::getSCD41Data() {
 
     error = pSCD41->readMeasurement(co2, temp, hum);
     if (error) {
-        SensirionI2CScd4x::errorToString(error, errorMessage, sizeof(errorMessage));
+        //SensirionI2cScd4x::errorToString(error, errorMessage, sizeof(errorMessage));
 
-        strncpy(sSCD41LastError, errorMessage, sizeof(sSCD41LastError) - 1);
-        sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
+        //strncpy(sSCD41LastError, errorMessage, sizeof(sSCD41LastError) - 1);
+        //sSCD41LastError[sizeof(sSCD41LastError) - 1] = '\0';
 
         return data;
     }

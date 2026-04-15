@@ -5,9 +5,8 @@
 // Neccessary for the AkorSensorBoard (ASB) of the MiniCtrlBox project.
 
 #include <AHT20.h>              // for temperature and humidity sensor
-#include <7Semi_MLX90393.h>     // for magnetic sensor
-#include <SensirionI2CScd4x.h>  // for CO2-Sensor
-
+#include <7Semi_MLX90393.h>     // for magnetic sensor  // for CO2-Sensor
+#include <SensirionI2cScd4x.h>
 
 
 
@@ -63,7 +62,8 @@ namespace nspMiniCtrlBox {
         MLX90393_7Semi* pMLX90393 = nullptr;
 
         // New: SCD41 sensor
-        SensirionI2CScd4x* pSCD41 = nullptr;
+        SensirionI2cScd4x* pSCD41 = nullptr;
+        
         bool bSCD41Initialized = false;
         char sSCD41LastError[64] = {0};
 
