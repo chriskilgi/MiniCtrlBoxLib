@@ -1,8 +1,16 @@
+// tim.h
+// This file is part of the MiniCtrlBoxLib - A library for the MiniCtrlBox project.
+// Copyright (c) 2026 by Christoph Kilgenstein. All rights reserved.
+// Headerfile for tim.cpp (Relais, Buzzer, LED)
+// Neccessary for the Mainboard of the MiniCtrlBox project.
+
 #pragma once
 #include <Arduino.h>
 
 namespace nspMiniCtrlBox {
-// Abstraction for ESP32 hardware timers with callback functions and auto-reload functionality.
+    // The CTimer class provides an interface for using the hardware timers of the ESP32 in the MiniCtrlBox project.
+    // It allows setting up a timer with a specified interval and a callback function that will be
+    // called when the timer expires. The timer can be set to auto-reload, meaning it will automatically restart after expiring.
     class CTimer {
     public:
         CTimer(int iHWTimer, uint64_t ui64TriggerIntervall, void (*pTimerCallbackFunction)() = nullptr, bool boAutoReload = true);

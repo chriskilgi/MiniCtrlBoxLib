@@ -1,3 +1,9 @@
+// mcp.h
+// This file is part of the MiniCtrlBoxLib - A library for the MiniCtrlBox project.
+// Copyright (c) 2026 by Christoph Kilgenstein. All rights reserved.
+// Headerfile for mcp.cpp (MCP23017)
+// Neccessary for the Mainboard and SwitchLEDBoard of the MiniCtrlBox project.
+
 #pragma once
 #include <MCP23017.h>
 
@@ -6,7 +12,7 @@ namespace nspMiniCtrlBox {
 #define MCP_SLB_ADDRESS 0x21    // Address for the MCP23017 on the SwitchLEDBoard
 
 #define MINICTRLBOX_VERSION_GLOB MINICTRLBOX_VERSION
-
+// The CMCP class provides a common interface for controlling MCP23017 port expanders, with derived classes for specific boards (Mainboard and SwitchLEDBoard).
 class CMCP {
     public:
         CMCP(uint8_t ui8MCPAddress);

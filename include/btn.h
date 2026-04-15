@@ -1,3 +1,9 @@
+// btn.h
+// This file is part of the MiniCtrlBoxLib - A library for the MiniCtrlBox project.
+// Copyright (c) 2026 by Christoph Kilgenstein. All rights reserved.
+// Headerfile for btn.cpp (Button)
+// Neccessary for the Mainboard of the MiniCtrlBox project.
+
 #pragma once
 #include <driver/gpio.h>
 #include <esp_timer.h>
@@ -6,6 +12,7 @@
 #define PIN_BUTTON_2 GPIO_NUM_3
 
 namespace nspMiniCtrlBox {
+    // The CButton class provides debounced button handling with interrupt support for the buttons connected to the Mainboard of the MiniCtrlBox project.
     class CButton {
     public:
         CButton(gpio_num_t interruptPin, uint32_t ui32DebounceMs= 30);

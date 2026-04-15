@@ -1,3 +1,9 @@
+// asbSensors.h
+// This file is part of the MiniCtrlBoxLib - A library for the MiniCtrlBox project.
+// Copyright (c) 2026 by Christoph Kilgenstein. All rights reserved.
+// Headerfile for asbSensors.cpp (AHT20, MLX90393, Analog)
+// Neccessary for the AkorSensorBoard (ASB) of the MiniCtrlBox project.
+
 #include <AHT20.h>
 #include <7Semi_MLX90393.h>
 
@@ -6,6 +12,7 @@
 #define PIN_ASB_SENSORS_ANALOG GPIO_NUM_0
 
 namespace nspMiniCtrlBox {
+    // The CASBSensors class provides methods to interact with the sensors (AHT20, MLX90393, Analog) connected to the AktorSensorBoard (ASB).
     class CASBSensors {
     public:
         // Struct to hold the magnetic sensor data

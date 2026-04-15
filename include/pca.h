@@ -1,3 +1,8 @@
+// pca.h
+// This file is part of the MiniCtrlBoxLib - A library for the MiniCtrlBox project.
+// Copyright (c) 2026 by Christoph Kilgenstein. All rights reserved.
+// Headerfile for pca.cpp (PCA9685)
+// Neccessary for the PotiRGBServoBoard of the MiniCtrlBox project.
 
 #include <Adafruit_PWMServoDriver.h>
 
@@ -5,7 +10,8 @@ namespace nspMiniCtrlBox {
 #define PCA_ADDRESS 0x40 // Base address for PCA9685 (plus the 3 address pins A0, A1, A2 via MCP23017)
 #define PIN_OUTPUT_ENABLE GPIO_NUM_7 // GPIO pin used to control the OE pin of the PCA9685
 
-
+    // The CServo class provides methods to control the PCA9685 PWM driver connected to the PotiRGBServoBoard of the MiniCtrlBox project.
+    // In addition to controlling the PWM outputs for the RGB LEDs and servos, it also provides methods for reading the potentiometer voltage and servo sensor states.
     class CServo {
     public:
         // The PWMChannel enum defines the identifiers for the 8 PWM channels of the PCA9685.

@@ -1,8 +1,15 @@
+// dsp.h
+// This file is part of the MiniCtrlBoxLib - A library for the MiniCtrlBox project.
+// Copyright (c) 2026 by Christoph Kilgenstein. All rights reserved.
+// Headerfile for dsp.cpp (OLED-Display)
+// Neccessary for the Mainboard of the MiniCtrlBox project.
+
 #pragma once
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
 
 namespace nspMiniCtrlBox {
+    // The COLed class provides methods to control the OLED display (SSD1306) connected to the Mainboard of the MiniCtrlBox project.
     class COLed {
     public:
         COLed(TwoWire& wire = Wire, int8_t rst = -1);
