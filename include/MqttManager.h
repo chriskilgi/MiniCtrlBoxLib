@@ -12,6 +12,7 @@ public:
 
     void publish(const char* topic, const char* payload);
     void publish(const char* topic, float value);
+    void publish(const char* topic, int value);
 
 private:
     MqttContext& ctx;

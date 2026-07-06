@@ -50,6 +50,12 @@ void MqttManager::publish(const char* topic, float value) {
     publish(topic, buf);
 }
 
+void MqttManager::publish(const char* topic, int value) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%d", value);
+    publish(topic, buf);
+}
+
 void MqttManager::handleWifiConnect() {
     ctx.wifiConnected = true;
     ctx.client.connect();
