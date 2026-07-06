@@ -22,11 +22,17 @@ void MqttManager::setupWifi() {
 }
 
 void MqttManager::setupMqtt() {
-    ctx.client.onConnect([this](bool sp){ handleMqttConnect(sp); });
-    ctx.client.onDisconnect([this](auto reason){ handleMqttDisconnect(reason); });
+    ctx.client.onConnect([this](bool sp){
+        handleMqttConnect(sp);
+    });
+
+    ctx.client.onDisconnect([this](AsyncMqttClientDisconnectReason reason){
+        handleMqttDisconnect(reason);
+    });
 
     ctx.client.setServer(ctx.brokerHost, ctx.brokerPort);
 }
+
 
 void MqttManager::loop() {
     // optional reconnect logic
