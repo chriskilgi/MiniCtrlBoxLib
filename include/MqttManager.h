@@ -1,7 +1,6 @@
 #pragma once
 #include "MqttContext.h"
 
-
 namespace nspMiniCtrlBox {
 class MqttManager {
 public:
@@ -13,6 +12,10 @@ public:
     void publish(const char* topic, const char* payload);
     void publish(const char* topic, float value);
     void publish(const char* topic, int value);
+
+    // NEW
+    void subscribe(const char* topic);
+    void setMessageHandler(std::function<void(const String&, const String&)> handler);
 
 private:
     MqttContext& ctx;

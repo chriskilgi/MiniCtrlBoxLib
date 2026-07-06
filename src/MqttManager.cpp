@@ -1,6 +1,7 @@
 #include "MqttManager.h"
 
 namespace nspMiniCtrlBox {
+
 MqttManager::MqttManager(MqttContext& c) : ctx(c) {}
 
 void MqttManager::begin() {
@@ -30,9 +31,21 @@ void MqttManager::setupMqtt() {
         handleMqttDisconnect(reason);
     });
 
+    // NEW: Message Callback
+    ctx.client.onMessage([this](char* topic, char* payload,
+                                AsyncMqttClientMessageProperties,
+                                size_t len, size_t, size_t) {
+
+        String t = String(topic);
+        String msg = String(payload).substring(0, len);
+
+        if (ctx.onMessage) {
+            ctx.onMessage(t, msg);
+        }
+    });
+
     ctx.client.setServer(ctx.brokerHost, ctx.brokerPort);
 }
-
 
 void MqttManager::loop() {
     // optional reconnect logic
@@ -46,7 +59,7 @@ void MqttManager::publish(const char* topic, const char* payload) {
 
 void MqttManager::publish(const char* topic, float value) {
     char buf[32];
-    snprintf(buf, sizeof(buf), "%.3f", value);
+    snprintf(buf, sizeof(buf), "%.1f", value);
     publish(topic, buf);
 }
 
@@ -67,10 +80,23 @@ void MqttManager::handleWifiDisconnect() {
 
 void MqttManager::handleMqttConnect(bool) {
     ctx.mqttConnected = true;
+
+    // NEW: Standard-Subscribe
+    ctx.client.subscribe("MiniCtrlBox/Command/#", 1);
 }
 
 void MqttManager::handleMqttDisconnect(AsyncMqttClientDisconnectReason) {
     ctx.mqttConnected = false;
+}
+
+// NEW
+void MqttManager::subscribe(const char* topic) {
+    ctx.client.subscribe(topic, 1);
+}
+
+// NEW
+void MqttManager::setMessageHandler(std::function<void(const String&, const String&)> handler) {
+    ctx.onMessage = handler;
 }
 
 } // namespace nspMiniCtrlBox

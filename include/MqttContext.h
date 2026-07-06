@@ -1,6 +1,7 @@
 #pragma once
 #include <AsyncMqttClient.h>
 #include <WiFi.h>
+#include <functional>
 
 namespace nspMiniCtrlBox {
 struct MqttContext {
@@ -14,5 +15,8 @@ struct MqttContext {
 
     bool wifiConnected = false;
     bool mqttConnected = false;
+
+    // NEW: Callback für eingehende MQTT-Kommandos
+    std::function<void(const String&, const String&)> onMessage;
 };
 } // namespace nspMiniCtrlBox
