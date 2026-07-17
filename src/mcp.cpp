@@ -133,6 +133,35 @@ void CPortExpRem::setLEDPort(uint8_t ui8PortState) {
     pMCP->setPort(ui8PortState, A); // Set the specified LED color on port A
 }
 
+// Function to set the state of all LEDs on the SwitchLEDBoard based on a port state byte, while keeping the current state of the other LEDs unchanged
+void CPortExpRem::setLEDPortRemain(uint8_t ui8PortState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+    uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+    currentState |= ui8PortState; // Set the specified LED color bits while keeping the current state of the other LEDs unchanged
+    pMCP->setPort(currentState, A); // Set the specified LED color on port A
+}
+
+// Function to reset the state of all LEDs on the SwitchLEDBoard based on a port state byte, while keeping the current state of the other LEDs unchanged
+void CPortExpRem::resetLEDPortRemain(uint8_t ui8PortState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+    uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+    currentState &= ~ui8PortState; // Clear the specified LED color bits while keeping the current state of the other LEDs unchanged
+    pMCP->setPort(currentState, A); // Set the specified LED color on port A
+}
+
+void CPortExpRem::toggleLEDPortRemain(uint8_t ui8PortState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+    uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+    currentState ^= ui8PortState; // Toggle the specified LED color bits while keeping the current state of the other LEDs unchanged
+    pMCP->setPort(currentState, A); // Set the specified LED color on port A
+}
+
 // Function to read the state of the switches on the SwitchLEDBoard
 uint8_t CPortExpRem::getSwitchState() {
     if(pMCP == nullptr) {
@@ -149,5 +178,11 @@ bool CPortExpRem::getSwitchState(uint8_t ui8SwitchNo) {
         return pMCP->getPin(ui8SwitchNo, B); // Read and return the state of the specified switch from port B
     }
     return false;
+}
+uint8_t CPortExpRem::getLEDPortState() {
+    if(pMCP == nullptr) {
+        return 0; // If the MCP instance is not initialized, exit the function
+    }
+    return pMCP->getPort(A); // Read and return the state of the LEDs from port A
 }
 } // namespace nspMiniCtrlBox

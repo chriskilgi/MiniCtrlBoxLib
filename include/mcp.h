@@ -79,9 +79,13 @@ class CPortExpRem : public CMCP {
         void setLED(LEDColor tLEDColor, bool boState);
         void setLED(uint8_t ui8LED, bool boState);
         void setLEDPort(uint8_t ui8PortState); // Function to set the state of all LEDs on the SwitchLEDBoard based on a port state byte
+        void setLEDPortRemain(uint8_t ui8PortState); // Function to set the state of all LEDs on the SwitchLEDBoard based on a port state byte, while keeping the current state of the other LEDs unchanged
+        void resetLEDPortRemain(uint8_t ui8PortState); // Function to reset the state of all LEDs on the SwitchLEDBoard based on a port state byte, while keeping the current state of the other LEDs unchanged
+        void toggleLEDPortRemain(uint8_t ui8PortState); // Function to toggle the state of all LEDs on the SwitchLEDBoard based on a port state byte, while keeping the current state of the other LEDs unchanged
 
         uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard
         bool getSwitchState(uint8_t ui8SwitchNo); // Overloaded function to check if specific switches are pressed based on a switch index (0-7)
+        uint8_t getLEDPortState(); // Function to read the state of all LEDs on the SwitchLEDBoard as a port state byte
     protected:
         bool onBegin();
 };
