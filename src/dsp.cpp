@@ -65,8 +65,9 @@ void COLed::clearLine(uint8_t ui8Row) {
 void COLed::printAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcText) {
     if (ui8Row >= rows || ui8Col >= cols) return;
 
+    clearLine(ui8Row);  // Clear the line before printing new text
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-        //clearLine(ui8Row);  
+        //clearLine(ui8Row);  // produces a deadlock, because the mutex is already taken
         display.setCursor(ui8Col * charW, ui8Row * charH);
         display.print(pcText);
         display.display();

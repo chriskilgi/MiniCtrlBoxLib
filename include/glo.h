@@ -9,7 +9,7 @@
 #include <Arduino.h>
 
 namespace nspMiniCtrlBox {
-    #define MINICTRLBOX_SW_VERSION "6.4.1"
+    #define MINICTRLBOX_SW_VERSION "6.4.2"
     #define MINICTRLBOX_HW_VERSION "3.0.1"
 
     // Global function to check if an I2C device is present at the specified address, with optional retries and delay between retries
