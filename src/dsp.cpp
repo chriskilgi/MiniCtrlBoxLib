@@ -32,7 +32,11 @@ void COLed::setTextSize(uint8_t ui8Size) {
     if (ui8Size > 3) ui8Size = 3;   // optional: limit to 3
 
     textSize = ui8Size;
-    display.setTextSize(textSize);
+
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        display.setTextSize(textSize);
+        xSemaphoreGive(xMutexI2C_g);
+    }
 
     // Update character dimensions
     charW = BASE_CHAR_W * textSize;
@@ -45,23 +49,29 @@ void COLed::setTextSize(uint8_t ui8Size) {
 void COLed::clearLine(uint8_t ui8Row) {
     if (ui8Row >= rows) return;
 
-    display.fillRect(
-        0,
-        ui8Row * charH,
-        WIDTH,
-        charH,
-        SSD1306_BLACK
-    );
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        display.fillRect(
+            0,
+            ui8Row * charH,
+            WIDTH,
+            charH,
+            SSD1306_BLACK
+        );
+        display.display();
+        xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 void COLed::printAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcText) {
     if (ui8Row >= rows || ui8Col >= cols) return;
 
-    clearLine(ui8Row);
-
-    display.setCursor(ui8Col * charW, ui8Row * charH);
-    display.print(pcText);
-    display.display();
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        clearLine(ui8Row);  
+        display.setCursor(ui8Col * charW, ui8Row * charH);
+        display.print(pcText);
+        display.display();
+        xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 void COLed::printLine(uint8_t ui8Row, const char* pcText) {
@@ -69,8 +79,11 @@ void COLed::printLine(uint8_t ui8Row, const char* pcText) {
 }
 
 void COLed::clear() {
-    display.clearDisplay();
-    display.display();
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        display.clearDisplay();
+        display.display();
+        xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 void COLed::printfAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcFormattedText, ...) {

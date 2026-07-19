@@ -7,6 +7,7 @@
 #pragma once
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
+#include <glo.h>
 
 namespace nspMiniCtrlBox {
     // The COLed class provides methods to control the OLED display (SSD1306) connected to the Mainboard of the MiniCtrlBox project.

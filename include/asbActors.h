@@ -6,6 +6,7 @@
 
 #pragma once
 #include <Arduino.h>
+#include <glo.h>
 
 #define PIN_ASB_ACTORS_RELAIS GPIO_NUM_1
 #define PIN_ASB_ACTORS_BUZZER GPIO_NUM_3
@@ -18,15 +19,24 @@ namespace nspMiniCtrlBox {
             CASBActors();
 
             void setRelais(bool boState) {
-                digitalWrite(PIN_ASB_ACTORS_RELAIS, boState ? HIGH : LOW);
+                if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+                    digitalWrite(PIN_ASB_ACTORS_RELAIS, boState ? HIGH : LOW);
+                    xSemaphoreGive(xMutexI2C_g);
+                }
             }
 
             void setBuzzer(bool boState) {
-                digitalWrite(PIN_ASB_ACTORS_BUZZER, boState ? HIGH : LOW);
+                if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+                    digitalWrite(PIN_ASB_ACTORS_BUZZER, boState ? HIGH : LOW);
+                    xSemaphoreGive(xMutexI2C_g);
+                }
             }
 
             void setLED(bool boState) {
-                digitalWrite(PIN_ASB_ACTORS_LED, boState ? HIGH : LOW);
+                if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+                    digitalWrite(PIN_ASB_ACTORS_LED, boState ? HIGH : LOW);
+                    xSemaphoreGive(xMutexI2C_g);
+                }
             }
         private:
     };

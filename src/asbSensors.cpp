@@ -1,4 +1,5 @@
 #include <asbSensors.h>
+#include <glo.h>
 
 namespace nspMiniCtrlBox {
 // Alias for the magnetic sensor data struct, to avoid having to write CASBSensors::TMLX90393Data everywhere
@@ -27,7 +28,12 @@ float CASBSensors::getAHT20Temperature() {
     if (!pAHT20) {
         return -273.15f; // Return a very low temperature if the sensor is not installed :-)
     }
-    return pAHT20->getTemperature();
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        float fTemp = pAHT20->getTemperature();
+        xSemaphoreGive(xMutexI2C_g);
+        return fTemp;
+    }
+    return 0.0;
 }
 
 // Return the humidity value from the AHT20 sensor, or -1 if the sensor is not installed
@@ -35,7 +41,12 @@ float CASBSensors::getAHT20Humidity() {
     if (!pAHT20) {
         return -100.0f; // Return an impossible value if the sensor is not installed
     }
-    return pAHT20->getHumidity();
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        float fHumidity = pAHT20->getHumidity();
+        xSemaphoreGive(xMutexI2C_g);
+        return fHumidity;
+    }
+    return 0.0;
 }
 
 // Try to initialize the AHT20 sensor and return true if successful, false otherwise
@@ -80,7 +91,10 @@ TMLX90393Data CASBSensors::getMLX90393Data() {
         return tMagneticData; // Return default values if the sensor is not installed
     } else {
         // Read the magnetic field data from the MLX90393 sensor and store it in the data struct
-        pMLX90393->readMag(tMagneticData.x, tMagneticData.y, tMagneticData.z);
+        if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+            pMLX90393->readMag(tMagneticData.x, tMagneticData.y, tMagneticData.z);
+            xSemaphoreGive(xMutexI2C_g);
+        }
     }
     return tMagneticData;
 }
@@ -110,14 +124,15 @@ TSCD4xData CASBSensors::getSCD4xData() {
         return tSCD4xData; // Return default values if the sensor is not installed
     }
 
-    while (!pSCD4x->readMeasurement()) {
-        ;
-    }   
-
-    tSCD4xData.ui16CO2 = pSCD4x->getCO2();
-    tSCD4xData.fTemperature = pSCD4x->getTemperature();
-    tSCD4xData.fHumidity = pSCD4x->getHumidity();
-
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        while (!pSCD4x->readMeasurement()) {
+            ;
+        }   
+        tSCD4xData.ui16CO2 = pSCD4x->getCO2();
+        tSCD4xData.fTemperature = pSCD4x->getTemperature();
+        tSCD4xData.fHumidity = pSCD4x->getHumidity();
+        xSemaphoreGive(xMutexI2C_g);
+    }
     return tSCD4xData;
 }
 

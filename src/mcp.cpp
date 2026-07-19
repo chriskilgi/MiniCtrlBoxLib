@@ -39,11 +39,15 @@ bool CPortExpLoc::onBegin() {
         pMCP = new MCP23017(ui8MCPAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
     
-    pMCP->Init(); // Initialize the MCP23017
-    delay(10); // Short delay to ensure the MCP23017 is ready after initialization
-    pMCP->setPortMode(0xFF, B); // Set all pins of port B as outputs (for RGB LEDs)
-    pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (as they are not used for the RGB LEDs, we can set them as outputs to avoid floating inputs)
-    pMCP->setPort(0x01, A); 
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        pMCP->Init(); // Initialize the MCP23017
+        delay(10); // Short delay to ensure the MCP23017 is ready after initialization
+        pMCP->setPortMode(0xFF, B); // Set all pins of port B as outputs (for RGB LEDs)
+        pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (as they are not used for the RGB LEDs, we can set them as outputs to avoid floating inputs)
+        pMCP->setPort(0x01, A); 
+        xSemaphoreGive(xMutexI2C_g);
+    }
+
     return true;
 }
 
@@ -53,14 +57,17 @@ void CPortExpLoc::setColor(RGBLEDColor tLEDColor, bool boState) {
         return; // If the MCP instance is not initialized, exit the function
     }
 
-    uint8_t currentState = pMCP->getPort(B); // Read the current state of port B
-    
-    if (boState) {
-        currentState |= tLEDColor; // Set the specified LED color bits
-    } else {
-        currentState &= ~tLEDColor; // Clear the specified LED color bits
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t currentState = pMCP->getPort(B); // Read the current state of port B
+        
+        if (boState) {
+            currentState |= tLEDColor; // Set the specified LED color bits
+        } else {
+            currentState &= ~tLEDColor; // Clear the specified LED color bits
+        }
+        pMCP->setPort(currentState, B); // Set the specified LED color on port B
+        xSemaphoreGive(xMutexI2C_g);
     }
-    pMCP->setPort(currentState, B); // Set the specified LED color on port B
 }
 
 // Overloaded function to set the state of a specific LED color on the Mainboard based on the color index (0-5) and state
@@ -68,8 +75,11 @@ void CPortExpLoc::setColor(uint8_t ui8Color, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
-    if (ui8Color >= 0 && ui8Color <= 5) {
-        pMCP->setPin(ui8Color, B, boState); // Set the specified LED color on port B
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        if (ui8Color >= 0 && ui8Color <= 5) {
+            pMCP->setPin(ui8Color, B, boState); // Set the specified LED color on port B
+        }
+        xSemaphoreGive(xMutexI2C_g);
     }
 }   
 
@@ -92,10 +102,13 @@ bool CPortExpRem::onBegin() {
         pMCP = new MCP23017(ui8MCPAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
 
-    pMCP->Init(); // Initialize the MCP23017
-    delay(10); // Short delay to ensure the MCP23017 is ready after initialization
-    pMCP->setPortMode(0x00, B); // Set all pins of port B as inputs (for switches)
-    pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (for LEDs)
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        pMCP->Init(); // Initialize the MCP23017
+        delay(10); // Short delay to ensure the MCP23017 is ready after initialization
+        pMCP->setPortMode(0x00, B); // Set all pins of port B as inputs (for switches)
+        pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (for LEDs)
+        xSemaphoreGive(xMutexI2C_g);
+    }
     return true;
 }
 
@@ -105,14 +118,17 @@ void CPortExpRem::setLED(LEDColor tLEDColor, bool boState) {
         return; // If the MCP instance is not initialized, exit the function
     }
 
-    uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
-    
-    if (boState) {
-        currentState |= tLEDColor; // Set the specified LED color bits
-    } else {
-        currentState &= ~tLEDColor; // Clear the specified LED color bits
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+        
+        if (boState) {
+            currentState |= tLEDColor; // Set the specified LED color bits
+        } else {
+            currentState &= ~tLEDColor; // Clear the specified LED color bits
+        }
+        pMCP->setPort(currentState, A); // Set the specified LED color on port A
+        xSemaphoreGive(xMutexI2C_g);
     }
-    pMCP->setPort(currentState, A); // Set the specified LED color on port A
 }
 
 // Overloaded function to set the state of a specific LED on the SwitchLEDBoard based on the LED index (0-7) and state
@@ -120,8 +136,11 @@ void CPortExpRem::setLED(uint8_t ui8LED, bool boState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
-    if (ui8LED >= 0 && ui8LED <= 7) {
-        pMCP->setPin(ui8LED, A, boState); // Set the specified LED on port A
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        if (ui8LED >= 0 && ui8LED <= 7) {
+            pMCP->setPin(ui8LED, A, boState); // Set the specified LED on port A
+        }
+        xSemaphoreGive(xMutexI2C_g);
     }
 }   
 
@@ -130,7 +149,10 @@ void CPortExpRem::setLEDPort(uint8_t ui8PortState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
-    pMCP->setPort(ui8PortState, A); // Set the specified LED color on port A
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        pMCP->setPort(ui8PortState, A); // Set the specified LED color on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 // Function to set the state of all LEDs on the SwitchLEDBoard based on a port state byte, while keeping the current state of the other LEDs unchanged
@@ -138,9 +160,12 @@ void CPortExpRem::setLEDPortRemain(uint8_t ui8PortState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
-    uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
-    currentState |= ui8PortState; // Set the specified LED color bits while keeping the current state of the other LEDs unchanged
-    pMCP->setPort(currentState, A); // Set the specified LED color on port A
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+        currentState |= ui8PortState; // Set the specified LED color bits while keeping the current state of the other LEDs unchanged
+        pMCP->setPort(currentState, A); // Set the specified LED color on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 // Function to reset the state of all LEDs on the SwitchLEDBoard based on a port state byte, while keeping the current state of the other LEDs unchanged
@@ -148,18 +173,24 @@ void CPortExpRem::resetLEDPortRemain(uint8_t ui8PortState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
-    uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
-    currentState &= ~ui8PortState; // Clear the specified LED color bits while keeping the current state of the other LEDs unchanged
-    pMCP->setPort(currentState, A); // Set the specified LED color on port A
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+        currentState &= ~ui8PortState; // Clear the specified LED color bits while keeping the current state of the other LEDs unchanged
+        pMCP->setPort(currentState, A); // Set the specified LED color on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 void CPortExpRem::toggleLEDPortRemain(uint8_t ui8PortState) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
     }
-    uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
-    currentState ^= ui8PortState; // Toggle the specified LED color bits while keeping the current state of the other LEDs unchanged
-    pMCP->setPort(currentState, A); // Set the specified LED color on port A
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+        currentState ^= ui8PortState; // Toggle the specified LED color bits while keeping the current state of the other LEDs unchanged
+        pMCP->setPort(currentState, A); // Set the specified LED color on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 // Function to read the state of the switches on the SwitchLEDBoard
@@ -167,15 +198,25 @@ uint8_t CPortExpRem::getSwitchState() {
     if(pMCP == nullptr) {
         return 0; // If the MCP instance is not initialized, exit the function
     }
-    return pMCP->getPort(B); // Read and return the state of the switches from port B
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t switchState = pMCP->getPort(B); // Read the state of the switches from port B
+        xSemaphoreGive(xMutexI2C_g);
+        return switchState; // Return the state of the switches
+    }
+    return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
 }
 
 bool CPortExpRem::getSwitchState(uint8_t ui8SwitchNo) {
     if(pMCP == nullptr) {
         return false; // If the MCP instance is not initialized, exit the function
     }
+    
     if (ui8SwitchNo >= 0 && ui8SwitchNo <= 7) {
-        return pMCP->getPin(ui8SwitchNo, B); // Read and return the state of the specified switch from port B
+        if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+            bool switchState = pMCP->getPin(ui8SwitchNo, B); // Read the state of the specified switch from port B
+            xSemaphoreGive(xMutexI2C_g);
+            return switchState; // Return the state of the specified switch
+        }
     }
     return false;
 }
@@ -183,6 +224,11 @@ uint8_t CPortExpRem::getLEDPortState() {
     if(pMCP == nullptr) {
         return 0; // If the MCP instance is not initialized, exit the function
     }
-    return pMCP->getPort(A); // Read and return the state of the LEDs from port A
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t ledState = pMCP->getPort(A); // Read the state of the LEDs from port A
+        xSemaphoreGive(xMutexI2C_g);
+        return ledState; // Return the state of the LEDs
+    }
+    return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
 }
 } // namespace nspMiniCtrlBox

@@ -6,11 +6,16 @@
 
 #pragma once
 #include <stdint.h>
+#include <Arduino.h>
 
 namespace nspMiniCtrlBox {
-#define MINICTRLBOX_SW_VERSION "6.3.0"
-#define MINICTRLBOX_HW_VERSION "3.0.1"
+    #define MINICTRLBOX_SW_VERSION "6.4.0"
+    #define MINICTRLBOX_HW_VERSION "3.0.1"
 
-// Global function to check if an I2C device is present at the specified address, with optional retries and delay between retries
-bool gloIsI2CDevicePresent(uint8_t address, uint8_t retries = 5, uint16_t delayMs = 2);
+    // Global function to check if an I2C device is present at the specified address, with optional retries and delay between retries
+    bool gloIsI2CDevicePresent(uint8_t address, uint8_t retries = 5, uint16_t delayMs = 2);
+
+    // Global Mutex for I2C bus access across the library
+    extern SemaphoreHandle_t xMutexI2C_g; // Mutex for I2C bus access
+
 } // namespace nspMiniCtrlBox
