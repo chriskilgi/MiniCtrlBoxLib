@@ -19,24 +19,15 @@ namespace nspMiniCtrlBox {
             CASBActors();
 
             void setRelais(bool boState) {
-                if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-                    digitalWrite(PIN_ASB_ACTORS_RELAIS, boState ? HIGH : LOW);
-                    xSemaphoreGive(xMutexI2C_g);
-                }
+                digitalWrite(PIN_ASB_ACTORS_RELAIS, boState ? HIGH : LOW);
             }
 
             void setBuzzer(bool boState) {
-                if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-                    digitalWrite(PIN_ASB_ACTORS_BUZZER, boState ? HIGH : LOW);
-                    xSemaphoreGive(xMutexI2C_g);
-                }
+                digitalWrite(PIN_ASB_ACTORS_BUZZER, boState ? HIGH : LOW);
             }
 
             void setLED(bool boState) {
-                if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-                    digitalWrite(PIN_ASB_ACTORS_LED, boState ? HIGH : LOW);
-                    xSemaphoreGive(xMutexI2C_g);
-                }
+                digitalWrite(PIN_ASB_ACTORS_LED, boState ? HIGH : LOW);
             }
         private:
     };
