@@ -66,7 +66,7 @@ void COLed::printAt(uint8_t ui8Row, uint8_t ui8Col, const char* pcText) {
     if (ui8Row >= rows || ui8Col >= cols) return;
 
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-        clearLine(ui8Row);  
+        //clearLine(ui8Row);  
         display.setCursor(ui8Col * charW, ui8Row * charH);
         display.print(pcText);
         display.display();
