@@ -11,6 +11,8 @@ namespace nspMiniCtrlBox {
 #define MCP_LOCAL_ADDRESS 0x20  // Address for the MCP23017 on the Mainboard
 #define MCP_SLB_ADDRESS 0x21    // Address for the MCP23017 on the SwitchLEDBoard
 
+#define PIN_INT_MCP_SLB_B 0     // Interrupt pin for the MCP23017 on the SwitchLEDBoard
+
 #define MINICTRLBOX_VERSION_GLOB MINICTRLBOX_VERSION
 // The CMCP class provides a common interface for controlling MCP23017 port expanders, with derived classes for specific boards (Mainboard and SwitchLEDBoard).
 class CMCP {
@@ -86,6 +88,10 @@ class CPortExpRem : public CMCP {
         uint8_t getSwitchState(); // Function to read the state of the switches on the SwitchLEDBoard
         bool getSwitchState(uint8_t ui8SwitchNo); // Overloaded function to check if specific switches are pressed based on a switch index (0-7)
         uint8_t getLEDPortState(); // Function to read the state of all LEDs on the SwitchLEDBoard as a port state byte
+
+        void setInterruptMask(uint8_t ui8Mask); // Function to set the interrupt mask for the switches on the SwitchLEDBoard
+        void enableInterrupts(void (*callbackFunction)(void)); // Function to enable interrupts for the switches on the SwitchLEDBoard
+        void disableInterrupts(); // Function to disable interrupts for the switches on the SwitchLEDBoard
     protected:
         bool onBegin();
 };

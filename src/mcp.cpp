@@ -88,6 +88,9 @@ void CPortExpLoc::setColor(uint8_t ui8Color, bool boState) {
 // the LEDs and the switches connected to the MCP23017 on the SwitchLEDBoard
 CPortExpRem::CPortExpRem(uint8_t ui8MCPAddress) : CMCP(ui8MCPAddress) {
     // The constructor of CMCP will initialize the MCP23017 instance with the specified address
+    
+    // Set the interrupt pin for the MCP23017 on the SwitchLEDBoard as an input
+    pinMode(PIN_INT_MCP_SLB_B, INPUT); 
 }
 
 CPortExpRem::~CPortExpRem() {
@@ -230,5 +233,26 @@ uint8_t CPortExpRem::getLEDPortState() {
         return ledState; // Return the state of the LEDs
     }
     return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
+}
+
+void CPortExpRem::setInterruptMask(uint8_t ui8Mask) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        pMCP->setInterruptOnChangePort(ui8Mask, B); // Set the interrupt mask for the switches on the SwitchLEDBoard
+        xSemaphoreGive(xMutexI2C_g);
+    }
+}
+
+// Function to enable interrupts for the switches on the SwitchLEDBoard
+// The callbackFunction must have the form void IRAM_ATTR callbackFunction(void) and will be called when an interrupt occurs
+void CPortExpRem::enableInterrupts(void (*callbackFunction)(void)) {
+    attachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_SLB_B), callbackFunction, FALLING);
+}
+
+// Function to disable interrupts for the switches on the SwitchLEDBoard
+void CPortExpRem::disableInterrupts() {
+    detachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_SLB_B));
 }
 } // namespace nspMiniCtrlBox
