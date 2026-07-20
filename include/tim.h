@@ -16,6 +16,7 @@ namespace nspMiniCtrlBox {
         CTimer(int iHWTimer, uint64_t ui64TriggerIntervall, void (*pTimerCallbackFunction)() = nullptr, bool boAutoReload = true);
         void start();
         void stop();
+        void restart();
 
         // Method to set or change the timer callback function,
         // allowing dynamic assignment of the callback after timer creation
@@ -24,6 +25,7 @@ namespace nspMiniCtrlBox {
         }
 
     private:
+        bool boTimerEnabled; // Flag to indicate if the timer is enabled
         void (*pTimerCallbackFunction)(); // Pointer to the timer callback function
         hw_timer_t* pHwTimer;
         int iHWTimer; // Timer ID (0-3, where 0 and 1 belong to group 0, and 2 and 3 belong to group 1)

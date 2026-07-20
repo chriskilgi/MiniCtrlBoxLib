@@ -27,14 +27,27 @@ CTimer::CTimer(int iHWTimer, uint64_t ui64TriggerIntervall, void (*pTimerCallbac
 
     // Configure the timer alarm with the specified interval and auto-reload setting
     timerAlarmWrite(pHwTimer, ui64TriggerIntervall, boAutoReload);
+
+    boTimerEnabled = false; // Timer is initially disabled
 }
 
 void CTimer::start() {
     timerAlarmEnable(pHwTimer);
+    boTimerEnabled = true;
 }
 
 void CTimer::stop() {
     timerAlarmDisable(pHwTimer);
+    boTimerEnabled = false;
+}
+
+void CTimer::restart() {
+    if (boTimerEnabled) {
+        timerRestart(pHwTimer);
+    } else {
+        // If the timer is not enabled, start it instead of restarting
+        start();
+    }
 }
 
 // ---------------- ISR-WRAPPER ----------------

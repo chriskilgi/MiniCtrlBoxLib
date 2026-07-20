@@ -235,6 +235,7 @@ uint8_t CPortExpRem::getLEDPortState() {
     return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
 }
 
+// Function to set the interrupt mask for the switches on the SwitchLEDBoard
 void CPortExpRem::setInterruptMask(uint8_t ui8Mask) {
     if(pMCP == nullptr) {
         return; // If the MCP instance is not initialized, exit the function
