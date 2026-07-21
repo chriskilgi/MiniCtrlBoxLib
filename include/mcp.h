@@ -92,6 +92,7 @@ class CPortExpRem : public CMCP {
         void setInterruptMask(uint8_t ui8Mask); // Function to set the interrupt mask for the switches on the SwitchLEDBoard
         void enableInterrupts(void (*callbackFunction)(void)); // Function to enable interrupts for the switches on the SwitchLEDBoard
         void disableInterrupts(); // Function to disable interrupts for the switches on the SwitchLEDBoard
+        uint8_t getInterruptFlag(void); // Function to read the interrupt flag for the switches on the SwitchLEDBoard
     protected:
         bool onBegin();
 };

@@ -256,4 +256,18 @@ void CPortExpRem::enableInterrupts(void (*callbackFunction)(void)) {
 void CPortExpRem::disableInterrupts() {
     detachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_SLB_B));
 }
+
+// Function to read the interrupt flag for the switches on the SwitchLEDBoard
+// The interrupt flag indicates which switches have triggered an interrupt since the last read
+uint8_t CPortExpRem::getInterruptFlag() {
+    if(pMCP == nullptr) {
+        return 0; // If the MCP instance is not initialized, exit the function
+    }
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t interruptFlag = pMCP->getIntFlag(B); // Read the interrupt flag for port B
+        xSemaphoreGive(xMutexI2C_g);
+        return interruptFlag; // Return the interrupt flag
+    }
+    return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
+}
 } // namespace nspMiniCtrlBox
