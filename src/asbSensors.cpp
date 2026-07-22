@@ -90,6 +90,7 @@ TMLX90393Data CASBSensors::getMLX90393Data() {
     if (!pMLX90393) {
         return tMagneticData; // Return default values if the sensor is not installed
     } else {
+        pMLX90393->setGain(MLX90393_GAIN_1); // Set the gain to 1x for better resolution
         // Read the magnetic field data from the MLX90393 sensor and store it in the data struct
         if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
             pMLX90393->readMag(tMagneticData.x, tMagneticData.y, tMagneticData.z);
@@ -97,6 +98,17 @@ TMLX90393Data CASBSensors::getMLX90393Data() {
         }
     }
     return tMagneticData;
+}
+
+void CASBSensors::setMLX90393Gain(MLX90393_Gain gain) {
+    if (!pMLX90393) {
+        return; // Do nothing if the sensor is not installed
+    }
+
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+            pMLX90393->setGain(static_cast<MLX90393_Gain>(gain));
+            xSemaphoreGive(xMutexI2C_g);
+    }
 }
 
 // ----------------

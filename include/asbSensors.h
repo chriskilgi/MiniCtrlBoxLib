@@ -39,14 +39,15 @@ namespace nspMiniCtrlBox {
         // Methods for the magnetic sensor MLX90393
         bool initMLX90393();
         TMLX90393Data getMLX90393Data();
+        void setMLX90393Gain(MLX90393_Gain gain); // Setter for the gain of the MLX90393 sensor
 
         // Methods for the SCD4x CO2 sensor
         bool initSCD4x();
         TSCD4xData getSCD4xData();
 
         // Methods for the analog Port GPIO0 (e.g. for a potentiometer)
-        float getVoltageAnalog();
-        float getVoltagePercent();
+        float getVoltageAnalog(); 
+        float getVoltagePercent(); // Return the voltage as a percentage of the reference voltage
         uint16_t getVoltageDigital();
 
         void setReferenceVoltage(float fVoltage) { fRefVoltage = fVoltage; } // Setter for reference voltage

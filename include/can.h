@@ -28,6 +28,8 @@ namespace nspMiniCtrlBox {
         // Control CAN bus termination using the SSR
         void setCANTermination(bool boTermination);
 
+        void setBitrate(uint32_t bitrate);
+
     private:
         gpio_num_t txPin;
         gpio_num_t rxPin;

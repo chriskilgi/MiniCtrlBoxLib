@@ -30,6 +30,7 @@ void CCanBus::restart() {
     this->start();
 }
 
+// Start the CAN controller
 bool CCanBus::start() {
     if (running)
         return true;
@@ -56,6 +57,7 @@ bool CCanBus::start() {
     return true;
 }
 
+// Stop the CAN controller
 void CCanBus::stop() {
     if (!running)
         return;
@@ -64,6 +66,7 @@ void CCanBus::stop() {
     running = false;
 }
 
+// Transmit a CAN frame with a specified timeout
 bool CCanBus::transmit(const Frame& frame, uint32_t timeoutMs) {
     twai_message_t msg = {};
     msg.identifier        = frame.canIdentifier;
@@ -76,6 +79,7 @@ bool CCanBus::transmit(const Frame& frame, uint32_t timeoutMs) {
     return twai_transmit(&msg, pdMS_TO_TICKS(timeoutMs)) == ESP_OK;
 }
 
+// Receive a CAN frame with a specified timeout
 bool CCanBus::receive(Frame& outFrame, uint32_t timeoutMs) {
     twai_message_t msg;
 
@@ -93,6 +97,9 @@ bool CCanBus::receive(Frame& outFrame, uint32_t timeoutMs) {
 
 twai_timing_config_t CCanBus::timingFromBitrate(uint32_t bitrate) {
     switch (bitrate) {
+        case 25000:   return TWAI_TIMING_CONFIG_25KBITS();
+        case 50000:   return TWAI_TIMING_CONFIG_50KBITS();
+        case 100000:  return TWAI_TIMING_CONFIG_100KBITS();
         case 250000:  return TWAI_TIMING_CONFIG_250KBITS();
         case 500000:  return TWAI_TIMING_CONFIG_500KBITS();
         case 1000000: return TWAI_TIMING_CONFIG_1MBITS();
@@ -100,7 +107,20 @@ twai_timing_config_t CCanBus::timingFromBitrate(uint32_t bitrate) {
     }
 }
 
+// Control CAN bus termination using the SSR
 void CCanBus::setCANTermination(bool boTermination) {
     digitalWrite(PIN_SSR, boTermination);
 }
+
+// Change the CAN bus bitrate at runtime
+void CCanBus::setBitrate(uint32_t bitrate)
+{
+    if (this->bitrate != bitrate) {
+        this->bitrate = bitrate;
+        if (running) {
+            restart(); // Restart the CAN controller to apply the new bitrate
+        }
+    }
+}
+
 } // namespace nspMiniCtrlBox
