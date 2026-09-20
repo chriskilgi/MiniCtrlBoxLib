@@ -31,7 +31,7 @@ namespace nspMiniCtrlBox {
             return eeprom.begin();
         }
         bool isPresent(uint8_t ui8DeviceAddress = EEPROM_ADRESS);
-        uint8_t getAddress();
+        uint8_t getAddress(); // Get the I2C address of the EEPROM device
 
         void writeDeviceInfo(const TEEPROM* pDeviceInfo);
         void readDeviceInfo(TEEPROM* pDeviceInfo);

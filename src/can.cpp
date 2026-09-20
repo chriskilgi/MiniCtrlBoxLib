@@ -5,6 +5,7 @@ namespace nspMiniCtrlBox {
 CCanBus::CCanBus(gpio_num_t txPin, gpio_num_t rxPin, uint32_t bitrate)
     : txPin(txPin), rxPin(rxPin), bitrate(bitrate), running(false)
 {
+    pinMode(PIN_SSR, OUTPUT);
     setCANTermination(false); // Ensure CAN bus termination is disabled at startup
 
 }
