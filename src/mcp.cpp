@@ -270,4 +270,105 @@ uint8_t CPortExpRem::getInterruptFlag() {
     }
     return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
 }
+
+/* ***************************************************** End of class CPortExpRem ********************************************************** */
+
+/*----------------------------------------------------------------------------------------------*/
+// The CPortExpOOPExp class inherits from CPortExpRem and changes specific functionality for controlling
+// the LEDs and the switches connected to the MCP23017 on the OOPExp-Board
+CPortExpOOPExp::CPortExpOOPExp(uint8_t ui8MCPAddress) : CPortExpRem(ui8MCPAddress) {
+    // The constructor of CMCP will initialize the MCP23017 instance with the specified address
+    
+    // Set the interrupt pin for the MCP23017 on the OOPExpBoard as an input
+    pinMode(PIN_INT_MCP_OOPEXP_B, INPUT); 
+}
+
+CPortExpOOPExp::~CPortExpOOPExp() {
+    // The destructor of CMCP will clean up the MCP23017 instance
+}
+
+// The begin function initializes the MCP23017 and sets the pin modes for the LEDs and switches
+bool CPortExpOOPExp::onBegin() {
+    if (!gloIsI2CDevicePresent(ui8MCPAddress)) { // Check if the MCP23017 device is present at the specified I2C address
+        return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
+    } else {
+        pMCP = new MCP23017(ui8MCPAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
+    }
+
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        pMCP->Init(); // Initialize the MCP23017
+        delay(10); // Short delay to ensure the MCP23017 is ready after initialization
+        pMCP->setPortMode(0x0F, B); // Set the lower 4 pins of port B as inputs (for switches)
+        pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (for LEDs)
+        xSemaphoreGive(xMutexI2C_g);
+    }
+    return true;
+}
+
+// Function to set the state of the LEDs on the SwitchLEDBoard based on the specified LED color and state
+// The LED colors for the OOPExpBoard are different from the SwitchLEDBoard, so this function is overridden in the derived class CPortExpOOPExp
+void CPortExpOOPExp::setLED(LEDColor tLEDColor, bool boState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t currentState = pMCP->getPort(A); // Read the current state of port A
+        
+        if (boState) {
+            currentState |= tLEDColor; // Set the specified LED color bits
+        } else {
+            currentState &= ~tLEDColor; // Clear the specified LED color bits
+        }
+        pMCP->setPort(currentState, A); // Set the specified LED color on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }
+}
+
+// Function to read the state of the switches on the SwitchLEDBoard
+uint8_t CPortExpOOPExp::getSwitchState() {
+    if(pMCP == nullptr) {
+        return 0; // If the MCP instance is not initialized, exit the function
+    }
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t switchState = pMCP->getPort(B); // Read the state of the switches from port B
+        xSemaphoreGive(xMutexI2C_g);
+        return switchState & 0x0F; // Return the state of the switches (only the lower 4 bits are relevant for the OOPExpBoard)
+    }
+    return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
+}
+
+// Overloaded function to check if specific switches are pressed based on a switch index (0-3)
+bool CPortExpOOPExp::getSwitchState(uint8_t ui8SwitchNo) {
+    if(pMCP == nullptr) {
+        return false; // If the MCP instance is not initialized, exit the function
+    }
+    
+    if (ui8SwitchNo >= 0 && ui8SwitchNo <= 3) { // Only switches 0-3 are valid for the OOPExpBoard
+        if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+            bool switchState = pMCP->getPin(ui8SwitchNo, B); // Read the state of the specified switch from port B
+            xSemaphoreGive(xMutexI2C_g);
+            return switchState; // Return the state of the specified switch
+        }
+    }
+    return false;
+}
+
+// Function to enable interrupts for the switches on the OOPExpBoard
+// The callbackFunction must have the form void IRAM_ATTR callbackFunction(void) and will be called when an interrupt occurs
+// The interrupt pin for the OOPExpBoard is connected to GPIO 3, which is used for the interrupt signal from the MCP23017
+// Therefore, this function hast to be overridden in the derived class CPortExpOOPExp to use the correct interrupt pin for the OOPExpBoard
+void CPortExpOOPExp::enableInterrupts(void (*callbackFunction)(void)) {
+    attachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_OOPEXP_B), callbackFunction, FALLING);
+}
+
+// Function to disable interrupts for the switches on the SwitchLEDBoard
+// The interrupt pin for the OOPExpBoard is connected to GPIO 3, which is used for the interrupt signal from the MCP23017
+// Therefore, this function hast to be overridden in the derived class CPortExpOOPExp to use the correct interrupt pin for the OOPExpBoard
+void CPortExpOOPExp::disableInterrupts() {
+    detachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_OOPEXP_B));
+}
+
+
+/* ***************************************************** End of class CPortExpOOPExp ******************************************************* */
 } // namespace nspMiniCtrlBox

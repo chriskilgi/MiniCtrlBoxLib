@@ -10,8 +10,10 @@
 namespace nspMiniCtrlBox {
 #define MCP_LOCAL_ADDRESS 0x20  // Address for the MCP23017 on the Mainboard
 #define MCP_SLB_ADDRESS 0x21    // Address for the MCP23017 on the SwitchLEDBoard
+#define MCP_OOPExp_ADDRESS 0x21 // Address for the MCP23017 on the OOPExpBoard
 
 #define PIN_INT_MCP_SLB_B 0     // Interrupt pin for the MCP23017 on the SwitchLEDBoard
+#define PIN_INT_MCP_OOPEXP_B 3  // Interrupt pin for the MCP23017 on the OOPExpBoard
 
 #define MINICTRLBOX_VERSION_GLOB MINICTRLBOX_VERSION
 // The CMCP class provides a common interface for controlling MCP23017 port expanders, with derived classes for specific boards (Mainboard and SwitchLEDBoard).
@@ -97,13 +99,42 @@ class CPortExpRem : public CMCP {
         bool onBegin();
 };
 
+class CPortExpOOPExp : public CPortExpRem {
+    public:
+        // Konstanten für die LEDs auf dem OOPExpBoard
+        enum LEDColor : uint8_t {
+            ALLLEDS = 0b11111111,
+            LEDFG0 = 0b00000001,
+            LEDFG1 = 0b00000010,
+            LEDFG2 = 0b00000100,
+            LEDFG3 = 0b00001000,
+            LEDSW1 = 0b00010000,
+            LEDSW2 = 0b00100000,
+            LEDSW3 = 0b01000000,
+            LEDSW4 = 0b10000000
+        };    
+
+        CPortExpOOPExp(uint8_t ui8MCPAddress = MCP_OOPExp_ADDRESS); // Default I2C address for the OOPExpBoard
+        ~CPortExpOOPExp();
+        
+        void setLED(LEDColor tLEDColor, bool boState);
+        uint8_t getSwitchState(); // Function to read the state of the switches on the OOPExpBoard
+        bool getSwitchState(uint8_t ui8SwitchNo); // Overloaded function to check if specific switches are pressed based on a switch index (0-3)
+        void enableInterrupts(void (*callbackFunction)(void)); // Function to enable interrupts for the switches on the OOPExpBoard
+        void disableInterrupts(); // Function to disable interrupts for the switches on the OOPExpBoard
+
+        protected:
+        bool onBegin();
+};
+
 // Bitwise OR operator overload for RGBLEDColor combining LED colors
 inline CPortExpLoc::RGBLEDColor operator|(CPortExpLoc::RGBLEDColor a, CPortExpLoc::RGBLEDColor b) {
     return static_cast<CPortExpLoc::RGBLEDColor>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
 
+
 // Bitwise OR operator overload for LEDColor to allow combining multiple LEDs
 inline CPortExpRem::LEDColor operator|(CPortExpRem::LEDColor a, CPortExpRem::LEDColor b) {
     return static_cast<CPortExpRem::LEDColor>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
-} // namespace nspMiniCtrlBox
+} // namespace nspMiniCtrlBox   

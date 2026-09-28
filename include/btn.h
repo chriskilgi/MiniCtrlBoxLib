@@ -10,6 +10,8 @@
 
 #define PIN_BUTTON_1 GPIO_NUM_10
 #define PIN_BUTTON_2 GPIO_NUM_3
+#define PIN_BUTTON_LEFT PIN_BUTTON_2
+#define PIN_BUTTON_RIGHT PIN_BUTTON_1
 
 namespace nspMiniCtrlBox {
     // The CButton class provides debounced button handling with interrupt support for the buttons connected to the Mainboard of the MiniCtrlBox project.
