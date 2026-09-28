@@ -249,7 +249,7 @@ void CPortExpRem::setInterruptMask(uint8_t ui8Mask) {
 // Function to enable interrupts for the switches on the SwitchLEDBoard
 // The callbackFunction must have the form void IRAM_ATTR callbackFunction(void) and will be called when an interrupt occurs
 void CPortExpRem::enableInterrupts(void (*callbackFunction)(void)) {
-    attachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_SLB_B), callbackFunction, FALLING);
+    attachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_SLB_B), callbackFunction, CHANGE);
 }
 
 // Function to disable interrupts for the switches on the SwitchLEDBoard
@@ -265,6 +265,7 @@ uint8_t CPortExpRem::getInterruptFlag() {
     }
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
         uint8_t interruptFlag = pMCP->getIntFlag(B); // Read the interrupt flag for port B
+        pMCP->getIntCap(B); // Clear the interrupt flag for port B to allow further interrupts
         xSemaphoreGive(xMutexI2C_g);
         return interruptFlag; // Return the interrupt flag
     }
@@ -298,14 +299,14 @@ bool CPortExpOOPExp::onBegin() {
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
         pMCP->Init(); // Initialize the MCP23017
         delay(10); // Short delay to ensure the MCP23017 is ready after initialization
-        pMCP->setPortMode(0x0F, B); // Set the lower 4 pins of port B as inputs (for switches)
+        pMCP->setPortMode(0xF0, B); // Set the lower 4 pins of port B as inputs (for switches)
         pMCP->setPortMode(0xFF, A); // Set all pins of port A as outputs (for LEDs)
         xSemaphoreGive(xMutexI2C_g);
     }
     return true;
 }
 
-// Function to set the state of the LEDs on the SwitchLEDBoard based on the specified LED color and state
+// Function to set the state of the LEDs on the OOPExpBoard based on the specified LED color and state
 // The LED colors for the OOPExpBoard are different from the SwitchLEDBoard, so this function is overridden in the derived class CPortExpOOPExp
 void CPortExpOOPExp::setLED(LEDColor tLEDColor, bool boState) {
     if(pMCP == nullptr) {
@@ -360,6 +361,7 @@ bool CPortExpOOPExp::getSwitchState(uint8_t ui8SwitchNo) {
 // Therefore, this function hast to be overridden in the derived class CPortExpOOPExp to use the correct interrupt pin for the OOPExpBoard
 void CPortExpOOPExp::enableInterrupts(void (*callbackFunction)(void)) {
     attachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_OOPEXP_B), callbackFunction, FALLING);
+    getInterruptFlag(); // Ensure that the interrupt flag is cleared in the beginning, so that the first interrupt can be detected correctly
 }
 
 // Function to disable interrupts for the switches on the SwitchLEDBoard
@@ -368,7 +370,6 @@ void CPortExpOOPExp::enableInterrupts(void (*callbackFunction)(void)) {
 void CPortExpOOPExp::disableInterrupts() {
     detachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_OOPEXP_B));
 }
-
 
 /* ***************************************************** End of class CPortExpOOPExp ******************************************************* */
 } // namespace nspMiniCtrlBox
