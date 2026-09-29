@@ -249,7 +249,8 @@ void CPortExpRem::setInterruptMask(uint8_t ui8Mask) {
 // Function to enable interrupts for the switches on the SwitchLEDBoard
 // The callbackFunction must have the form void IRAM_ATTR callbackFunction(void) and will be called when an interrupt occurs
 void CPortExpRem::enableInterrupts(void (*callbackFunction)(void)) {
-    attachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_SLB_B), callbackFunction, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(PIN_INT_MCP_SLB_B), callbackFunction, FALLING);
+    getInterruptFlag(); // Ensure that the interrupt flag is cleared in the beginning, so that the first interrupt can be detected correctly
 }
 
 // Function to disable interrupts for the switches on the SwitchLEDBoard
