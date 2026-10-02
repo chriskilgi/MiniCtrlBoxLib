@@ -19,20 +19,20 @@ namespace nspMiniCtrlBox {
 // The CMCP class provides a common interface for controlling MCP23017 port expanders, with derived classes for specific boards (Mainboard and SwitchLEDBoard).
 class CMCP {
     public:
-        CMCP(uint8_t ui8MCPAddress);
+        // The Destructor has to be public, so that the derived objects can be deleted properly,
+        // since the destructor of the derived class will call the destructor of the base class automatically
         ~CMCP();
-
-        bool begin() {
-            Wire.begin(); // Initialize I2C communication
-            return onBegin(); // Call the derived class's specific initialization
-        } 
-        
+        bool begin(); // Initialize the MCP23017 and set the pin modes for ports 
         bool isPresent(); // Check if the MCP23017 is present on the I2C bus
 
     protected:
-        virtual bool onBegin() = 0; // Pure virtual function for derived class initialization
+        CMCP(uint8_t ui8MCPAddress); // The constructor is protected to prevent direct instantiation of the base class
+
         uint8_t ui8MCPAddress; // I2C address of the MCP23017
         MCP23017 *pMCP; // Pointer to the MCP23017 instance, initialized in derived classes if the device is present
+
+        uint8_t ui8PortMaskA; // Mask for port A of the MCP23017 on the Mainboard respectively the SwitchLEDBoard respectively the OOPExpBoard
+        uint8_t ui8PortMaskB; // Mask for port B of the MCP23017 on the Mainboard respectively the SwitchLEDBoard respectively the OOPExpBoard        
 };
 
 
@@ -51,17 +51,16 @@ class CPortExpLoc : public CMCP {
             BLUE1 = 0b00100000
         };
         CPortExpLoc(uint8_t ui8MCPAddress = MCP_LOCAL_ADDRESS);
-        ~CPortExpLoc();
 
         // Function to set the state of the RGB LEDs based on the specified color and state
         void setColor(RGBLEDColor tLEDColor, bool boState);
         // Overloaded function to set the state of the RGB LEDs based on a color index (0-5) and state
         void setColor(uint8_t ui8Color, bool boState);
     protected:
-        bool onBegin();
+
 };
 
-// The CMCPSLB class inherits from CMCP and provides specific functionality for controlling
+// The CPortExpRem class inherits from CMCP and provides specific functionality for controlling
 // the LEDs and the switches connected to the MCP23017 on the SwitchLEDBoard
 class CPortExpRem : public CMCP {
     public:
@@ -78,7 +77,6 @@ class CPortExpRem : public CMCP {
             LEDBL1 = 0b10000000
         };
         CPortExpRem(uint8_t ui8MCPAddress = MCP_SLB_ADDRESS);
-        ~CPortExpRem();
         
         void setLED(LEDColor tLEDColor, bool boState);
         void setLED(uint8_t ui8LED, bool boState);
@@ -96,9 +94,12 @@ class CPortExpRem : public CMCP {
         void disableInterrupts(); // Function to disable interrupts for the switches on the SwitchLEDBoard
         uint8_t getInterruptFlag(void); // Function to read the interrupt flag for the switches on the SwitchLEDBoard
     protected:
-        bool onBegin();
+        uint8_t ui8FilterMaskSwitchState; // Mask to filter the switch state in the derived class CPortExpOOPExp, since the OOPExpBoard only has 4 switches (SW1-SW4) and the other 4 bits are not relevant for the OOPExpBoard
+        uint8_t ui8MaxSwitchNo; // Maximum switch number for the derived class CPortExpOOPExp, since the OOPExpBoard only has 4 switches (SW1-SW4) and the other 4 bits are not relevant for the OOPExpBoard
+        uint8_t ui8InterruptPin; // Interrupt pin, since the OOPExpBoard has a different interrupt pin than the SwitchLEDBoard
 };
 
+// The CPortExpOOPExp class inherits from CPortExpRem and provides specific functionality for controlling
 class CPortExpOOPExp : public CPortExpRem {
     public:
         // Konstanten für die LEDs auf dem OOPExpBoard
@@ -115,16 +116,8 @@ class CPortExpOOPExp : public CPortExpRem {
         };    
 
         CPortExpOOPExp(uint8_t ui8MCPAddress = MCP_OOPExp_ADDRESS); // Default I2C address for the OOPExpBoard
-        ~CPortExpOOPExp();
         
         void setLED(LEDColor tLEDColor, bool boState);
-        uint8_t getSwitchState(); // Function to read the state of the switches on the OOPExpBoard
-        bool getSwitchState(uint8_t ui8SwitchNo); // Overloaded function to check if specific switches are pressed based on a switch index (0-3)
-        void enableInterrupts(void (*callbackFunction)(void)); // Function to enable interrupts for the switches on the OOPExpBoard
-        void disableInterrupts(); // Function to disable interrupts for the switches on the OOPExpBoard
-
-        protected:
-        bool onBegin();
 };
 
 // Bitwise OR operator overload for RGBLEDColor combining LED colors
