@@ -33,6 +33,8 @@ bool CMCP::begin() {
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
         pMCP->Init(); // Initialize the MCP23017
         delay(10); // Short delay to ensure the MCP23017 is ready after initialization
+        pMCP->setPort(0x00, A); // Set all pins of port A to LOW
+        pMCP->setPort(0x00, B); // Set all pins of port B to LOW
         pMCP->setPortMode(ui8PortMaskA, A); // Set all pins of port A as outputs (as they are not used for the RGB LEDs, we can set them as outputs to avoid floating inputs)
         pMCP->setPortMode(ui8PortMaskB, B); // Set all pins of port B as outputs (for RGB LEDs)
         xSemaphoreGive(xMutexI2C_g);
