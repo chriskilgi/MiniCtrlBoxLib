@@ -9,6 +9,7 @@
 #include <glo.h>
 
 #define EEPROM_ADRESS 0x50
+#define EEPROM_ADRESS_SWITCHLEDBOARD 0x52
 
 namespace nspMiniCtrlBox {
     // Struct to hold the device information that will be stored in the EEPROM
