@@ -21,14 +21,17 @@ namespace nspMiniCtrlBox {
 
         ~CButton(); 
 
-        bool hasButtonPressed() const;
-        bool hasButtonReleased() const;
+        bool hasButtonPressed();
+        bool hasButtonReleased();
         void resetPressedFlag();
         void resetReleasedFlag();
 
 
         // Has to be called in the main loop to update the button state and set the flag
         // when a stable button press or releaseis detected
+        // 11.10.2026: the method is now called within hasButtonPressed() and hasButtonReleased() 
+        // so, it is not longer necessary to call it in the main loop anymore.
+        // But it does not harm to call it in the main loop, so it is still possible to do so.
         void updateFlags();
 
     private:

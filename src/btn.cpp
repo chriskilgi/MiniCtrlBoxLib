@@ -28,8 +28,14 @@ CButton::~CButton() {
     gpio_isr_handler_remove(pin);
 }
 
-bool CButton::hasButtonPressed()  const { return boPressedFlag; }
-bool CButton::hasButtonReleased() const { return boReleasedFlag; }
+bool CButton::hasButtonPressed()   { 
+    updateFlags(); // Ensure the flags are updated before checking
+    return boPressedFlag;
+}
+bool CButton::hasButtonReleased() {
+    updateFlags(); // Ensure the flags are updated before checking
+    return boReleasedFlag;
+}
 void CButton::resetPressedFlag() { boPressedFlag = false; }
 void CButton::resetReleasedFlag() { boReleasedFlag = false; }
 
