@@ -30,11 +30,19 @@ CButton::~CButton() {
 
 bool CButton::hasButtonPressed()   { 
     updateFlags(); // Ensure the flags are updated before checking
-    return boPressedFlag;
+    if (boPressedFlag) {
+        boPressedFlag = false; // Reset the flag after checking
+        return true;
+    }
+    return false;
 }
 bool CButton::hasButtonReleased() {
     updateFlags(); // Ensure the flags are updated before checking
-    return boReleasedFlag;
+    if (boReleasedFlag) {
+        boReleasedFlag = false; // Reset the flag after checking
+        return true;
+    }
+    return false;
 }
 void CButton::resetPressedFlag() { boPressedFlag = false; }
 void CButton::resetReleasedFlag() { boReleasedFlag = false; }
