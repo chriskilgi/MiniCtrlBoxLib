@@ -28,18 +28,20 @@ CButton::~CButton() {
     gpio_isr_handler_remove(pin);
 }
 
-bool CButton::hasButtonPressed()   { 
+bool CButton::hasButtonPressed(bool boResetFlag)   { 
     updateFlags(); // Ensure the flags are updated before checking
     if (boPressedFlag) {
-        boPressedFlag = false; // Reset the flag after checking
+        if(boResetFlag)
+            boPressedFlag = false; // Reset the flag after checking
         return true;
     }
     return false;
 }
-bool CButton::hasButtonReleased() {
+bool CButton::hasButtonReleased(bool boResetFlag) {
     updateFlags(); // Ensure the flags are updated before checking
     if (boReleasedFlag) {
-        boReleasedFlag = false; // Reset the flag after checking
+        if(boResetFlag)
+            boReleasedFlag = false; // Reset the flag after checking
         return true;
     }
     return false;

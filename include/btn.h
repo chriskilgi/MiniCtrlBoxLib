@@ -21,8 +21,8 @@ namespace nspMiniCtrlBox {
 
         ~CButton(); 
 
-        bool hasButtonPressed();
-        bool hasButtonReleased();
+        bool hasButtonPressed(bool boResetFlag = true);
+        bool hasButtonReleased(bool boResetFlag = true);
         void resetPressedFlag();
         void resetReleasedFlag();
 
