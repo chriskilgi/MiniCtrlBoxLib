@@ -1,7 +1,7 @@
-Die MiniCtrlBox ist ein Unterrichtsprojekt an der Technikerschule Erlangen, das ich
-(Christoph Kilgenstein) im Schuljahr 2025/2026 entwickelt habe, um damit den
-Unterricht im Fach "Programmieren in C++" besonders anschaulich und praxisnah
-gestalten zu können.
+Die MiniCtrlBox ist ein Unterrichtsprojekt an der Fachschule für Technik der
+Stadt Erlangen, das ich (Christoph Kilgenstein) im Schuljahr 2025/2026 entwickelt
+habe, um damit den Unterricht im Fach "Programmieren in C++" besonders anschaulich
+und praxisnah gestalten zu können.
 Es handelt sich hierbei um eine Controllerplatine, die neben dem ESP32-C3 Supermini
 ein paar weitere Komponenten wie z.B. einen CAN-Transceiver enthält, so dass mehrere
 Einheiten über den Bus vernetzt werden können.Die Platine ist in ein 3D-Druck-Gehäuse
@@ -13,9 +13,9 @@ werden können.
 
 Weitere Infos gerne unter: christoph.kilgenstein@technikerschule-erlangen.de
 
-The MiniCtrlBox is a classroom project at the Erlangen Technical School (Technikerschule Erlangen)
-that I (Christoph Kilgenstein) developed during the 2025/2026 academic year to make instruction in
-the subject "Programming in C++" particularly vivid and practical.
+The MiniCtrlBox is a classroom project at the Technical School of Erlangen (Fachschule für
+Technik der Stadt Erlangen) that I (Christoph Kilgenstein) developed during the 2025/2026
+academic year to make instruction in the subject "Programming in C++" particularly vivid and practical.
 It consists of a controller board featuring an ESP32-C3 Supermini along with several additional
 components—such as a CAN transceiver—that allow multiple units to be networked via a bus.
 The board is housed in a 3D-printed enclosure and includes a small OLED display, two RGB LEDs,
