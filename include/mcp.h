@@ -11,9 +11,12 @@ namespace nspMiniCtrlBox {
 #define MCP_LOCAL_ADDRESS 0x20  // Address for the MCP23017 on the Mainboard
 #define MCP_SLB_ADDRESS 0x21    // Address for the MCP23017 on the SwitchLEDBoard
 #define MCP_OOPExp_ADDRESS 0x21 // Address for the MCP23017 on the OOPExpBoard
+#define MCP_KEYPAD_ADDRESS 0x21 // Address for the MCP23017 on the KeyPad-Board
 
 #define PIN_INT_MCP_SLB_B 0     // Interrupt pin for the MCP23017 on the SwitchLEDBoard
 #define PIN_INT_MCP_OOPEXP_B 3  // Interrupt pin for the MCP23017 on the OOPExpBoard
+#define PIN_INT_MCP_KEYPAD_A 0  // Interrupt pin for Port A of the MCP23017 on the KeyPad-Board
+#define PIN_INT_MCP_KEYPAD_B 1  // Interrupt pin for Port B of the MCP23017 on the KeyPad-Board
 
 #define MINICTRLBOX_VERSION_GLOB MINICTRLBOX_VERSION
 // The CMCP class provides a common interface for controlling MCP23017 port expanders, with derived classes for specific boards (Mainboard and SwitchLEDBoard).
@@ -35,8 +38,51 @@ class CMCP {
         uint8_t ui8PortMaskB; // Mask for port B of the MCP23017 on the Mainboard respectively the SwitchLEDBoard respectively the OOPExpBoard        
 };
 
+// The CKeyPad class inherits from CMCP and provides specific functionality for controlling
+// the LEDs and the beeper, and serves the keypad function
+class CKeyPad : public CMCP {
+    public:
+        CKeyPad(uint8_t ui8MCPAddress = MCP_KEYPAD_ADDRESS);
+        // Bitmasks for the LEDs on the KeyPad-Board
+        enum ELEDBitmask : uint8_t {
+            ALLLEDS = 0b01100000,
+            LEDBMRE = 0b00100000,
+            LEDBMGN = 0b01000000,
+        };
+        enum ELEDNumber : uint8_t {
+            LEDNRE = 0,
+            LEDNGN = 1
+        };
 
-// The CMCPLOCAL class inherits from CMCP and provides specific functionality for controlling
+        void setLED(ELEDBitmask tLEDMask, bool boState);
+        void setLED(ELEDNumber LEDNo, bool boState);
+        void setBeeper(bool boState);
+        uint8_t getKey(void); // Function to read the key pressed on the KeyPad-Board, returns a value from 0 to 15 for keys 0-15, or 0xFF if no key is pressed
+        unsigned char getKeyChar(void); // Function to read the key pressed on the KeyPad-Board, returns a character for keys 0-15 or 0xFF if no key is pressed
+
+        void enableInterrupts(void (*callbackFunction)(void)); // Function to enable interrupts for the KeyPad-Board
+        void disableInterrupts(); // Function to disable interrupts for the KeyPad-Board
+        uint8_t getInterruptFlags(void); // Function to read the interrupt flag for the KeyPad-Board
+
+    protected:
+    private:
+        // Conversion table to map the key value (0-15) to the corresponding character for the KeyPad-Board
+        unsigned char ucKeyPadConversionTable[16] = { '1', '2', '3', 'A',
+                                                '4', '5', '6', 'B',
+                                                '7', '8', '9', 'C',
+                                                '*', '0', '#', 'D'};    
+        uint8_t correctWrongPinLevel(uint8_t ui8Key); // Function to correct the key value read from the KeyPad-Board, because of an error in the pin assignment of the LM339
+
+        uint8_t ui8InterruptPinPortA;   // Interrupt pin for Port A of the MCP23017 on the KeyPad-Board
+        uint8_t ui8InterruptPinPortB;   // Interrupt pin for Port B of the MCP23017 on the KeyPad-Board
+        uint8_t ui8InterruptMaskPortA;  // Interrupt mask for Port A of the MCP23017 on the KeyPad-Board
+        uint8_t ui8InterruptMaskPortB;  // Interrupt mask for Port B of the MCP23017 on the KeyPad-Board
+
+        void setInterruptMask(void); // Function to set the interrupt mask the KeyPad-Board
+};
+
+
+// The CPortExpLoc class inherits from CMCP and provides specific functionality for controlling
 // the RGB LEDs connected to the MCP23017 on the Mainboard
 class CPortExpLoc : public CMCP {
     public:
@@ -119,6 +165,11 @@ class CPortExpOOPExp : public CPortExpRem {
         
         void setLED(LEDColor tLEDColor, bool boState);
 };
+
+// Bitwise OR operator overload for RGBLEDColor combining LED colors
+inline CKeyPad::ELEDBitmask operator|(CKeyPad::ELEDBitmask a, CKeyPad::ELEDBitmask b) {
+    return static_cast<CKeyPad::ELEDBitmask>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+}
 
 // Bitwise OR operator overload for RGBLEDColor combining LED colors
 inline CPortExpLoc::RGBLEDColor operator|(CPortExpLoc::RGBLEDColor a, CPortExpLoc::RGBLEDColor b) {

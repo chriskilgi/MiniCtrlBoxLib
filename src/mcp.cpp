@@ -26,24 +26,180 @@ bool CMCP::begin() {
 
     if (!gloIsI2CDevicePresent(ui8MCPAddress)) { // Check if the MCP23017 device is present at the specified I2C address
         return false; // If the device is not present, exit the function (pMCP will remain nullptr to indicate that the device is not available)
-    } else {
+    } else if (pMCP == nullptr) {
         pMCP = new MCP23017(ui8MCPAddress, 99); // Create an instance of the MCP23017 with the specified I2C address and reset pin not used
     }
     
+    if (pMCP == nullptr) {
+        return false; // If the MCP instance could not be created, exit the function
+    }
+
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
         pMCP->Init(); // Initialize the MCP23017
         delay(10); // Short delay to ensure the MCP23017 is ready after initialization
-        pMCP->setPort(0x00, A); // Set all pins of port A to LOW
-        pMCP->setPort(0x00, B); // Set all pins of port B to LOW
-        pMCP->setPortMode(ui8PortMaskA, A); // Set all pins of port A as outputs (as they are not used for the RGB LEDs, we can set them as outputs to avoid floating inputs)
-        pMCP->setPortMode(ui8PortMaskB, B); // Set all pins of port B as outputs (for RGB LEDs)
+        pMCP->setPortMode(ui8PortMaskA, A); // Set pins of port A as set in constructor of derived classes (for LEDs or switches)
+        pMCP->setPortMode(ui8PortMaskB, B); // Set pins of port B as set in constructor of derived classes (for LEDs or switches)
+        // Set all OUTPUT pins of the MCP23017 to LOW to ensure that all LEDs are off at startup
+        pMCP->setPort(~ui8PortMaskA, A); // Set all OUTPUT pins of port A to LOW
+        pMCP->setPort(~ui8PortMaskB, B); // Set all OUTPUT pins of port B to LOW
         xSemaphoreGive(xMutexI2C_g);
     }
-
     return true;
 }
 
-/*----------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+// The CKeyPad class inherits from CMCP and provides specific functionality for controlling
+
+// 
+CKeyPad::CKeyPad(uint8_t ui8MCPAddress) : CMCP(ui8MCPAddress) {
+    // The constructor of CMCP will initialize the MCP23017 instance with the specified address
+    ui8PortMaskA = 0xF0; // Mask for port A of the MCP23017 on the KeyPad-Board: lower 4 bits are inputs (columns), upper 4 bits are outputs (LEDs and beeper)
+    ui8PortMaskB = 0xF0; // Mask for port B of the MCP23017 on the KeyPad-Board: lower 4 bits are inputs (rows), upper 4 bits are not used
+
+    ui8InterruptPinPortA = PIN_INT_MCP_KEYPAD_A; // Interrupt pin for Port A of the MCP23017 on the KeyPad-Board
+    ui8InterruptPinPortB = PIN_INT_MCP_KEYPAD_B; // Interrupt pin for Port B of the MCP23017 on the KeyPad-Board
+    ui8InterruptMaskPortA = 0x0F; // Interrupt mask for Port A of the MCP23017 on the KeyPad-Board: lower 4 bits (columns) will trigger interrupts
+    ui8InterruptMaskPortB = 0x0F; // Interrupt mask for Port B of the MCP23017 on the KeyPad-Board: lower 4 bits (rows) will trigger interrupts
+}
+
+// Function to switch on/off the LEDs on the KeyPad-Board, which are connected to pins GPA5 and GPA6 of the MCP23017
+// The function takes an ELEDBitmask to specify which LEDs to control and a boolean state to turn them on or off
+void CKeyPad::setLED(ELEDBitmask LEDBitmask, bool boState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }    
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        if(boState) {
+            pMCP->setPort(LEDBitmask, A); // Set the specified LEDs color on port A
+        } else {
+            pMCP->setPort(~LEDBitmask & 0b01100000, A); // Clear the specified LEDs color on port A
+        }
+        xSemaphoreGive(xMutexI2C_g);
+    }    
+}
+
+// Function to switch on/off the LEDs on the KeyPad-Board, which are connected to pins GPA5 and GPA6 of the MCP23017
+// The function takes an ELEDNumber to specify which LED to control and a boolean state to turn it on or off
+void CKeyPad::setLED(ELEDNumber LEDNo, bool boState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }    
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t ui8LEDPin = (LEDNo == 0) ? 5 : (LEDNo == 1) ? 6 : 7; // Map LED number to the corresponding pin on port A
+        pMCP->setPin(ui8LEDPin, A, boState); // Set the specified LED color on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }    
+}
+
+// Function to switch on/off the beeper on the KeyPad-Board, which is connected to pin GPA7 of the MCP23017
+void CKeyPad::setBeeper(bool boState) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }    
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        pMCP->setPin(7, A, boState); // Set the beeper pin on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }    
+}
+
+// Because of an error in the pin assignment within the LM339 in EasyEDA the ouput level
+// of the third comparator (Pin 14) has to be inverted (this output pin is wired to GPA2 of the MCP23017)
+uint8_t CKeyPad::correctWrongPinLevel(uint8_t ui8Key) {
+    uint8_t ui8KeyCorrected;
+
+    ui8KeyCorrected = ui8Key ^ 0b00000100;  // Toggle the third bit
+    return ui8KeyCorrected; 
+}
+
+// Function to read the key pressed on the KeyPad-Board, returns a value from 0 to 15 for keys 0-15, or 0xFF if no key is pressed
+uint8_t CKeyPad::getKey(void) {
+    if(pMCP == nullptr) {
+        return 0xFA; // If the MCP instance is not initialized, exit the function with error code
+    }    
+    
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t ui8Col = correctWrongPinLevel(pMCP->getPort(A)); // Read the column value from port A and correct the pin level due to the hardware error
+        uint8_t ui8Row = pMCP->getPort(B);
+        xSemaphoreGive(xMutexI2C_g);    // I2C-Bus access is finished, so the mutex can be released
+
+        ui8Col &= 0x0F; // Mask to get the lower 4 bits of port A (columns)
+        ui8Row &= 0x0F; // Mask to get the lower 4 bits of port B (rows)
+
+        // Check if any key is pressed by checking if the combined value of columns and rows is not 0xFF
+        // In passive mode, if no key is pressed, the columns and rows will both read as 0x0F (active low), resulting in a combined value of 0xFF
+        bool boKeyPressed = (((ui8Col << 4) | ui8Row) == 0xFF) ? false : true;
+
+        // Because the locic is active low, all bits have to be inverted
+        ui8Col = ~ui8Col & 0x0F; // Invert the column bits and mask to get the active column
+        ui8Row = ~ui8Row & 0x0F; // Invert the row bits and mask to get the active row
+
+        ui8Col = log2(ui8Col); // Get the column value (0-3) from port A
+        ui8Row = log2(ui8Row); // Get the row value (0-3) from port B
+
+        uint8_t ui8Key = ui8Col + 4 * ui8Row; // Calculate the key value based on the row and column values
+
+        return (boKeyPressed) ? ui8Key : 0xFF;
+    }      
+    return 0xFB; // Return error code if the mutex could not be taken
+}
+
+// Function to read the key pressed on the KeyPad-Board, returns the character for keys 0-15 printed on the keypad surface, or 0xFF if no key is pressed
+unsigned char CKeyPad::getKeyChar(void) {
+    uint8_t ui8Key = getKey(); // Get the key value (0-15) or 0xFF if no key is pressed
+    if (ui8Key == 0xFF || ui8Key == 0xFA || ui8Key == 0xFB) { // Check if no key is pressed or if there was an error
+        return ui8Key; // Return 0xFF if no key is pressed, or error codes 0xFA or 0xFB if there was an error
+    }
+    return ucKeyPadConversionTable[ui8Key]; // Return the corresponding character for the key value (0-9, A-F)
+}
+
+/* Interrupt functionality of class CKeyPad */
+// Function to set the interrupt mask for the KeyPad-Board, which determines which keys will trigger an interrupt when pressed
+void CKeyPad::setInterruptMask(void) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        //pMCP->setInterruptOnChangePort(ui8InterruptMaskPortA, A);
+        pMCP->setInterruptOnChangePort(ui8InterruptMaskPortB, B);
+        xSemaphoreGive(xMutexI2C_g);
+    }
+}
+
+// Function to enable interrupts for the switches on the KeyPad-Board, allowing the system to respond to key presses without polling
+// The callbackFunction must have the form void IRAM_ATTR callbackFunction(void) and will be called when an interrupt occurs
+void CKeyPad::enableInterrupts(void (*callbackFunction)(void)) {
+    setInterruptMask(); // Set the interrupt mask for the KeyPad-Board
+    //attachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortA), callbackFunction, FALLING);
+    attachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortB), callbackFunction, FALLING);
+    getInterruptFlags(); // Ensure that the interrupt flag is cleared in the beginning, so that the first interrupt can be detected correctly
+}
+
+// Function to disable interrupts for the switches on the SwitchLEDBoard
+void CKeyPad::disableInterrupts() {
+    //detachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortA));
+    detachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortB));
+}
+
+// Function to read the interrupt flags of both ports of the MCP23017 on the KeyPad-Board, which indicates which keys have triggered an interrupt since the last read
+uint8_t CKeyPad::getInterruptFlags() {
+    if(pMCP == nullptr) {
+        return 0; // If the MCP instance is not initialized, exit the function
+    }
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        uint8_t interruptFlagPortA = pMCP->getIntFlag(A) & 0x0F; // Read the interrupt flag for port A
+        uint8_t interruptFlagPortB = pMCP->getIntFlag(B) & 0x0F; // Read the interrupt flag for port B
+        pMCP->getIntCap(A); // Clear the interrupt flag for port B to allow further interrupts
+        pMCP->getIntCap(B); // Clear the interrupt flag for port B to allow further interrupts
+        xSemaphoreGive(xMutexI2C_g);
+        return (interruptFlagPortB << 4) | correctWrongPinLevel(interruptFlagPortA); // Return the interrupt flag
+    }
+    return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
+}
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // The CPortExpLoc class inherits from CMCP and provides specific functionality for controlling
 // the RGB LEDs connected to the MCP23017 on the Mainboard
 CPortExpLoc::CPortExpLoc(uint8_t ui8MCPAddress) : CMCP(ui8MCPAddress) {
