@@ -99,7 +99,20 @@ void CKeyPad::setBeeper(bool boState) {
         return; // If the MCP instance is not initialized, exit the function
     }    
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-        pMCP->setPin(7, A, boState); // Set the beeper pin on port A
+        pMCP->setPin(PIN_BEEPER_KEYPAD, A, boState); // Set the beeper pin on port A
+        xSemaphoreGive(xMutexI2C_g);
+    }    
+}
+
+// Overloaded Function to switch on the beeper on the KeyPad-Board for a specified duration in milliseconds
+void CKeyPad::beeper(unsigned short int usiMilliseconds) {
+    if(pMCP == nullptr) {
+        return; // If the MCP instance is not initialized, exit the function
+    }    
+    if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+        pMCP->setPin(PIN_BEEPER_KEYPAD, A, true);
+        delay(usiMilliseconds);
+        pMCP->setPin(PIN_BEEPER_KEYPAD, A, false);
         xSemaphoreGive(xMutexI2C_g);
     }    
 }

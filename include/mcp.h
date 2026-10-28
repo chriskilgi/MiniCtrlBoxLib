@@ -18,6 +18,8 @@ namespace nspMiniCtrlBox {
 #define PIN_INT_MCP_KEYPAD_A 0  // Interrupt pin for Port A of the MCP23017 on the KeyPad-Board
 #define PIN_INT_MCP_KEYPAD_B 1  // Interrupt pin for Port B of the MCP23017 on the KeyPad-Board
 
+#define PIN_BEEPER_KEYPAD 7 // Pin for the beeper on the KeyPad-Board (GPA7 of the MCP23017)
+
 #define MINICTRLBOX_VERSION_GLOB MINICTRLBOX_VERSION
 // The CMCP class provides a common interface for controlling MCP23017 port expanders, with derived classes for specific boards (Mainboard and SwitchLEDBoard).
 class CMCP {
@@ -57,6 +59,7 @@ class CKeyPad : public CMCP {
         void setLED(ELEDBitmask tLEDMask, bool boState);
         void setLED(ELEDNumber LEDNo, bool boState);
         void setBeeper(bool boState);
+        void beeper(unsigned short int usiMilliseconds);
         uint8_t getKey(void); // Function to read the key pressed on the KeyPad-Board, returns a value from 0 to 15 for keys 0-15, or 0xFF if no key is pressed
         unsigned char getKeyChar(void); // Function to read the key pressed on the KeyPad-Board, returns a character for keys 0-15 or 0xFF if no key is pressed
 
