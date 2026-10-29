@@ -65,7 +65,7 @@ class CKeyPad : public CMCP {
 
         void enableInterrupts(void (*callbackFunction)(void)); // Function to enable interrupts for the KeyPad-Board
         void disableInterrupts(); // Function to disable interrupts for the KeyPad-Board
-        uint8_t getInterruptFlags(void); // Function to read the interrupt flag for the KeyPad-Board
+        uint8_t freeInterrupts(void); // Function to free new interrupts and returns the key value (0-15) for the pressed key, or 0xFF if no key is pressed
 
     protected:
     private:

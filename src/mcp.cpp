@@ -60,6 +60,10 @@ CKeyPad::CKeyPad(uint8_t ui8MCPAddress) : CMCP(ui8MCPAddress) {
 
     ui8InterruptPinPortA = PIN_INT_MCP_KEYPAD_A; // Interrupt pin for Port A of the MCP23017 on the KeyPad-Board
     ui8InterruptPinPortB = PIN_INT_MCP_KEYPAD_B; // Interrupt pin for Port B of the MCP23017 on the KeyPad-Board
+
+    pinMode(ui8InterruptPinPortA, INPUT_PULLUP); // Set the interrupt pin for Port A as an input
+    pinMode(ui8InterruptPinPortB, INPUT_PULLUP); // Set the interrupt pin for Port B as an input
+
     ui8InterruptMaskPortA = 0x0F; // Interrupt mask for Port A of the MCP23017 on the KeyPad-Board: lower 4 bits (columns) will trigger interrupts
     ui8InterruptMaskPortB = 0x0F; // Interrupt mask for Port B of the MCP23017 on the KeyPad-Board: lower 4 bits (rows) will trigger interrupts
 }
@@ -174,7 +178,7 @@ void CKeyPad::setInterruptMask(void) {
         return; // If the MCP instance is not initialized, exit the function
     }
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-        //pMCP->setInterruptOnChangePort(ui8InterruptMaskPortA, A);
+        pMCP->setInterruptOnChangePort(ui8InterruptMaskPortA, A);
         pMCP->setInterruptOnChangePort(ui8InterruptMaskPortB, B);
         xSemaphoreGive(xMutexI2C_g);
     }
@@ -184,29 +188,35 @@ void CKeyPad::setInterruptMask(void) {
 // The callbackFunction must have the form void IRAM_ATTR callbackFunction(void) and will be called when an interrupt occurs
 void CKeyPad::enableInterrupts(void (*callbackFunction)(void)) {
     setInterruptMask(); // Set the interrupt mask for the KeyPad-Board
-    //attachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortA), callbackFunction, FALLING);
+    attachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortA), callbackFunction, FALLING);
     attachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortB), callbackFunction, FALLING);
-    getInterruptFlags(); // Ensure that the interrupt flag is cleared in the beginning, so that the first interrupt can be detected correctly
+    freeInterrupts(); // Ensure that the interrupt flag is cleared in the beginning, so that the first interrupt can be detected correctly
 }
 
 // Function to disable interrupts for the switches on the SwitchLEDBoard
 void CKeyPad::disableInterrupts() {
-    //detachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortA));
+    detachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortA));
     detachInterrupt(digitalPinToInterrupt(ui8InterruptPinPortB));
 }
 
-// Function to read the interrupt flags of both ports of the MCP23017 on the KeyPad-Board, which indicates which keys have triggered an interrupt since the last read
-uint8_t CKeyPad::getInterruptFlags() {
+// Function to free new interrupts and returns the key value (0-15) for the pressed key, or 0xFF if no key is pressed
+uint8_t CKeyPad::freeInterrupts() {
     if(pMCP == nullptr) {
         return 0; // If the MCP instance is not initialized, exit the function
     }
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-        uint8_t interruptFlagPortA = pMCP->getIntFlag(A) & 0x0F; // Read the interrupt flag for port A
-        uint8_t interruptFlagPortB = pMCP->getIntFlag(B) & 0x0F; // Read the interrupt flag for port B
-        pMCP->getIntCap(A); // Clear the interrupt flag for port B to allow further interrupts
-        pMCP->getIntCap(B); // Clear the interrupt flag for port B to allow further interrupts
-        xSemaphoreGive(xMutexI2C_g);
-        return (interruptFlagPortB << 4) | correctWrongPinLevel(interruptFlagPortA); // Return the interrupt flag
+        uint8_t ui8CapA = pMCP->getIntCap(A); // Clear the interrupt flag for port A to allow further interrupts
+        uint8_t ui8CapB = pMCP->getIntCap(B); // Clear the interrupt flag for port B to allow further interrupts
+         xSemaphoreGive(xMutexI2C_g); // I2C-Bus access is finished, so the mutex can be released
+
+        ui8CapA = correctWrongPinLevel(ui8CapA) & 0x0F; // Correct the pin level for port A due to the hardware error and mask to get the lower 4 bits
+        ui8CapB = ui8CapB & 0x0F; // Mask to get the lower 4 bits of port B
+        ui8CapA = ~ui8CapA & 0x0F; // Invert the bits of the captured value for port A to match the active low logic
+        ui8CapB = ~ui8CapB & 0x0F; // Invert the bits of the captured value for port B to match the active low logic
+        ui8CapA = log2(ui8CapA); // Get the column value (0-3) from port A
+        ui8CapB = log2(ui8CapB); // Get the row value (0-3) from port B
+
+        return (ui8CapA + 4 * ui8CapB); // Return the interrupt flag
     }
     return 0; // Return 0 if the MCP instance is not initialized or if the mutex could not be taken
 }
