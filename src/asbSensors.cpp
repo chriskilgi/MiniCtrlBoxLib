@@ -136,10 +136,15 @@ TSCD4xData CASBSensors::getSCD4xData() {
         return tSCD4xData; // Return default values if the sensor is not installed
     }
 
+    bool boReady = false;
+    while (!boReady) {
+        if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
+            boReady = pSCD4x->readMeasurement();
+            xSemaphoreGive(xMutexI2C_g);
+        }
+        vTaskDelay(pdMS_TO_TICKS(10)); // Wait for 10 ms before checking again
+    }
     if (xSemaphoreTake(xMutexI2C_g, portMAX_DELAY)) {
-        while (!pSCD4x->readMeasurement()) {
-            ;
-        }   
         tSCD4xData.ui16CO2 = pSCD4x->getCO2();
         tSCD4xData.fTemperature = pSCD4x->getTemperature();
         tSCD4xData.fHumidity = pSCD4x->getHumidity();
